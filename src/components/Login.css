@@ -169,6 +169,7 @@
   }
 
   .login-container input {
+    width: 95%;
     padding: 8px;
     font-size: 13px;
     margin: 8px 0;
