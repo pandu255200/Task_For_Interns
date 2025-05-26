@@ -1,32 +1,24 @@
-/* Animated background and card entrance */
+/* Base styles for all screens */
 .apple {
   margin: 0;
-  height: 100vh; /* full viewport height */
+  height: 100vh;
   display: flex;
-  justify-content: center; /* center horizontally */
-  align-items: center;     /* center vertically */
+  justify-content: center;
+  align-items: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(135deg, #667eea, #764ba2);
   animation: gradientShift 8s ease infinite;
   background-size: 200% 200%;
 }
 
-
 @keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .login-container {
   max-width: 400px;
-  /* margin: 100px auto; */ /* remove this */
   padding: 30px 20px;
   border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 16px;
@@ -38,20 +30,13 @@
   transition: transform 0.3s ease;
 }
 
-
 .login-container:hover {
   transform: translateY(-5px);
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .login-container h2 {
@@ -101,36 +86,20 @@
   font-weight: bold;
 }
 
-
-/* Responsive styles for small screens */
-@media (max-width: 480px) {
+/* Responsive styles - single consolidated media query */
+@media (max-width: 768px) {
   .login-container {
-    max-width: 90vw; /* almost full width on small screens */
-    padding: 20px 15px;
-    border-radius: 12px;
+    max-width: 85vw;
+    padding: 25px 15px;
+    border-radius: 14px;
   }
-
+  
   .login-container h2 {
-    font-size: 20px;
-  }
-
-  .login-container input {
-    width: 95%;
-    padding: 10px;
-    font-size: 14px;
-    margin: 10px 0;
-  }
-
-  .login-container button {
-    width: 100%;
-    padding: 12px;
-    font-size: 15px;
+    font-size: 22px;
+    margin-bottom: 15px;
   }
 }
 
-
-
-/* Responsive styles for small screens (up to 480px) */
 @media (max-width: 480px) {
   .login-container {
     max-width: 90vw;
@@ -140,6 +109,7 @@
 
   .login-container h2 {
     font-size: 20px;
+    margin-bottom: 12px;
   }
 
   .login-container input {
@@ -156,12 +126,10 @@
   }
 }
 
-/* Further adjustments for very small screens (up to 320px) */
 @media (max-width: 320px) {
   .login-container {
     max-width: 95vw;
     padding: 15px 10px;
-    border-radius: 10px;
   }
 
   .login-container h2 {
@@ -169,7 +137,6 @@
   }
 
   .login-container input {
-    width: 95%;
     padding: 8px;
     font-size: 13px;
     margin: 8px 0;
