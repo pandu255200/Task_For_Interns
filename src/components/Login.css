@@ -113,7 +113,7 @@
   }
 
   .login-container input {
-    width: 95%;
+    width: 85%;
     padding: 10px;
     font-size: 14px;
     margin: 10px 0;
@@ -137,6 +137,7 @@
   }
 
   .login-container input {
+            width: 95%;
     padding: 8px;
     font-size: 13px;
     margin: 8px 0;
