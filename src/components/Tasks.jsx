@@ -4,7 +4,10 @@ import "./Task.css";
 import logo from "../components/logo.webp";
 import { Mic } from "lucide-react";
 
-const API_BASE = process.env.REACT_APP_API_BASE;
+const API_BASE =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:5000/api"
+    : "https://backend-task-application.onrender.com/api";
 
 
 const Task = () => {
@@ -369,11 +372,13 @@ useEffect(() => {
           <div className="section form-section">
           
           <input
-            type="text"
-            placeholder="Enter Task"
-            value={taskInput}
-            onChange={(e) => setTaskInput(e.target.value)}
-          />
+  type="text"
+  placeholder="Enter Task"
+  value={taskInput}
+  onChange={(e) => setTaskInput(e.target.value)}
+  style={{ width: '500px' }} // Set any width you want
+/>
+
           <button 
             onClick={startListening}
             className={`voice-button ${listening ? 'listening' : ''}`}
