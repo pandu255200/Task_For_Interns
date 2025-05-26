@@ -1,0 +1,181 @@
+/* Animated background and card entrance */
+.apple {
+  margin: 0;
+  height: 100vh; /* full viewport height */
+  display: flex;
+  justify-content: center; /* center horizontally */
+  align-items: center;     /* center vertically */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  animation: gradientShift 8s ease infinite;
+  background-size: 200% 200%;
+}
+
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.login-container {
+  max-width: 400px;
+  /* margin: 100px auto; */ /* remove this */
+  padding: 30px 20px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 1.2s ease-out;
+  transition: transform 0.3s ease;
+}
+
+
+.login-container:hover {
+  transform: translateY(-5px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-container h2 {
+  margin-bottom: 20px;
+  color: #fff;
+  font-size: 24px;
+  letter-spacing: 1px;
+}
+
+.login-container input {
+  width: 90%;
+  padding: 12px;
+  margin: 12px 0;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.9);
+  transition: box-shadow 0.3s;
+}
+
+.login-container input:focus {
+  box-shadow: 0 0 5px #764ba2;
+}
+
+.login-container button {
+  width: 95%;
+  padding: 12px;
+  background: linear-gradient(45deg, #ff6ec4, #7873f5);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.login-container button:hover {
+  background: linear-gradient(45deg, #ff6ec4, #6a5acd);
+  transform: scale(1.03);
+}
+
+.error {
+  color: #ff4d4d;
+  margin-top: -5px;
+  font-weight: bold;
+}
+
+
+/* Responsive styles for small screens */
+@media (max-width: 480px) {
+  .login-container {
+    max-width: 90vw; /* almost full width on small screens */
+    padding: 20px 15px;
+    border-radius: 12px;
+  }
+
+  .login-container h2 {
+    font-size: 20px;
+  }
+
+  .login-container input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    margin: 10px 0;
+  }
+
+  .login-container button {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+  }
+}
+
+
+
+/* Responsive styles for small screens (up to 480px) */
+@media (max-width: 480px) {
+  .login-container {
+    max-width: 90vw;
+    padding: 20px 15px;
+    border-radius: 12px;
+  }
+
+  .login-container h2 {
+    font-size: 20px;
+  }
+
+  .login-container input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    margin: 10px 0;
+  }
+
+  .login-container button {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+  }
+}
+
+/* Further adjustments for very small screens (up to 320px) */
+@media (max-width: 320px) {
+  .login-container {
+    max-width: 95vw;
+    padding: 15px 10px;
+    border-radius: 10px;
+  }
+
+  .login-container h2 {
+    font-size: 18px;
+  }
+
+  .login-container input {
+    padding: 8px;
+    font-size: 13px;
+    margin: 8px 0;
+  }
+
+  .login-container button {
+    padding: 10px;
+    font-size: 14px;
+  }
+}
