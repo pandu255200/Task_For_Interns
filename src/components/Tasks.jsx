@@ -4,10 +4,7 @@ import "./Task.css";
 import logo from "../components/logo.webp";
 import { Mic } from "lucide-react";
 
-const API_BASE =
-  process.env.NODE_ENV === "development"
-    ? "http://localhost:5000/api"
-    : "https://backend-task-application.onrender.com/api";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 
 const Task = () => {
