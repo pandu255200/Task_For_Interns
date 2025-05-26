@@ -3,12 +3,12 @@ import axios from "axios";
 import "./Task.css";
 import logo from "../components/logo.webp";
 import { Mic } from "lucide-react";
+import { Search } from "lucide-react";
 
 const API_BASE =
   process.env.NODE_ENV === "development"
     ? "http://localhost:5000/api"
     : "https://backend-task-application.onrender.com/api";
-
 
 const Task = () => {
   // State hooks
@@ -23,11 +23,14 @@ const Task = () => {
   const [status, setStatus] = useState("pending");
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [animationMap, setAnimationMap] = useState({});
- const [listening, setListening] = useState(false);
+  const [listening, setListening] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(true);
-  
- const startListening = () => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const [searchTerm, setSearchTerm] = useState("");
+
+
+  const startListening = () => {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       alert("Voice input is not supported in your browser");
       return;
@@ -64,11 +67,11 @@ const Task = () => {
       setListening(false);
     }
   };
-const SpeechRecognition =
-  window.SpeechRecognition || window.webkitSpeechRecognition;
-const recognition = new SpeechRecognition();
-recognition.continuous = false;
-recognition.lang = "en-US";
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.lang = "en-US";
 
   // Fetch mentors on mount
   useEffect(() => {
@@ -82,7 +85,6 @@ recognition.lang = "en-US";
     };
     fetchMentors();
   }, []);
-  
 
   // Fetch all members on mount
   useEffect(() => {
@@ -232,20 +234,7 @@ recognition.lang = "en-US";
   };
 
   // Filter tasks based on selected mentor and intern
-  const filteredTasks = tasks.filter((task) => {
-    if (!selectedMentor) return true;
-
-    const teamMemberIds = teamMembers.map((m) => m._id);
-    const taskAssignedTo = task.assignedTo || task.intern;
-
-    if (!teamMemberIds.includes(taskAssignedTo)) return false;
-
-    if (selectedIntern) {
-      const selectedInternId = getInternIdByName(selectedIntern);
-      return taskAssignedTo === selectedInternId;
-    }
-    return true;
-  });
+  
 
   // Helper: get intern name by _id or name (fallback)
   const getInternNameById = (idOrName) => {
@@ -262,8 +251,9 @@ recognition.lang = "en-US";
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   };
-useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  useEffect(() => {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       setVoiceSupported(false);
       return;
@@ -276,7 +266,7 @@ useEffect(() => {
 
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
-      setTaskInput(prev => prev ? `${prev} ${transcript}` : transcript);
+      setTaskInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
       setListening(false);
     };
 
@@ -296,25 +286,54 @@ useEffect(() => {
   }, []);
 
   const handleVoiceInput = () => {
-  setListening(true);
-  recognition.start();
+    setListening(true);
+    recognition.start();
 
-  recognition.onresult = (event) => {
-    const voiceText = event.results[0][0].transcript;
-    setTaskInput(voiceText);  // Set task input from voice
-    setListening(false);
+    recognition.onresult = (event) => {
+      const voiceText = event.results[0][0].transcript;
+      setTaskInput(voiceText); // Set task input from voice
+      setListening(false);
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Speech recognition error:", event.error);
+      setListening(false);
+    };
+
+    recognition.onend = () => {
+      setListening(false);
+    };
   };
 
-  recognition.onerror = (event) => {
-    console.error('Speech recognition error:', event.error);
-    setListening(false);
-  };
+   const filteredTasks = tasks.filter((task) => {
+    // Filter by mentor if selected
+    if (selectedMentor) {
+      const teamMemberIds = teamMembers.map((m) => m._id);
+      const taskAssignedTo = task.assignedTo || task.intern;
+      
+      if (!teamMemberIds.includes(taskAssignedTo)) return false;
 
-  recognition.onend = () => {
-    setListening(false);
-  };
-};
+      // Filter by selected intern if any
+      if (selectedIntern) {
+        const selectedInternId = getInternIdByName(selectedIntern);
+        return taskAssignedTo === selectedInternId;
+      }
+    }
 
+    // Filter by search term if any
+    if (searchTerm) {
+      const internName = getInternNameById(task.assignedTo || task.intern);
+      const taskTitle = task.title || task.task;
+      
+      return (
+        internName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        taskTitle.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    return true;
+  });
+  
 
   return (
     <div className="task-container">
@@ -329,19 +348,39 @@ useEffect(() => {
 
       {/* Mentor selection */}
       <div className="section">
-        <label htmlFor="mentor-select">Select Mentor:</label>
-        <select
-          id="mentor-select"
-          value={selectedMentor}
-          onChange={(e) => setSelectedMentor(e.target.value)}
-        >
-          <option value="">-- Select Mentor --</option>
-          {mentors.map((mentor) => (
-            <option key={mentor._id} value={mentor._id}>
-              {mentor.name}
-            </option>
-          ))}
-        </select>
+         <div className="filter-section">
+        {/* Mentor selection */}
+        <div className="section mentor-select">
+          <label htmlFor="mentor-select">Select Mentor:</label>
+          <select
+            id="mentor-select"
+            value={selectedMentor}
+            onChange={(e) => setSelectedMentor(e.target.value)}
+          >
+            <option value="">-- Select Mentor --</option>
+            {mentors.map((mentor) => (
+              <option key={mentor._id} value={mentor._id}>
+                {mentor.name}
+              </option>
+            ))}
+          </select>
+          </div>
+          </div>
+        
+      </div>
+      <div className="section search-box">
+          <label htmlFor="task-search">Search Tasks:</label>
+          <div className="search-container">
+            <input
+              id="task-search"
+              type="text"
+              placeholder="Search by member name or task..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Search className="search-icon" size={18} />
+         
+        </div>
       </div>
 
       {/* Show team members & task form if mentor selected */}
@@ -370,30 +409,31 @@ useEffect(() => {
 
           {/* Task form */}
           <div className="section form-section">
-          
-          <input
-  type="text"
-  placeholder="Enter Task"
-  value={taskInput}
-  onChange={(e) => setTaskInput(e.target.value)}
-  style={{ width: '500px' }} // Set any width you want
-/>
+            <input
+              type="text"
+              placeholder="Enter Task"
+              value={taskInput}
+              onChange={(e) => setTaskInput(e.target.value)}
+              style={{ width: "500px" }} // Set any width you want
+            />
 
-          <button 
-            onClick={startListening}
-            className={`voice-button ${listening ? 'listening' : ''}`}
-            disabled={!voiceSupported}
-              title={voiceSupported ? "Use voice input" : "Voice input not supported"}
-                style={{ marginLeft: '-8px' }}
-          >
-            <Mic size={15} />
-            {listening && <span className="pulse-ring"></span>}
-          </button>
-        
+            <button
+              onClick={startListening}
+              className={`voice-button ${listening ? "listening" : ""}`}
+              disabled={!voiceSupported}
+              title={
+                voiceSupported ? "Use voice input" : "Voice input not supported"
+              }
+              style={{ marginLeft: "-8px" }}
+            >
+              <Mic size={15} />
+              {listening && <span className="pulse-ring"></span>}
+            </button>
+
             <select
               value={assignedTo}
               onChange={(e) => setAssignedTo(e.target.value)}
-               className="spaced-element"
+              className="spaced-element"
             >
               <option value="">Assign to</option>
               {teamMembers.map((member) => (
@@ -403,8 +443,11 @@ useEffect(() => {
               ))}
             </select>
 
-            <select value={status} onChange={(e) => setStatus(e.target.value)}
-             className="spaced-element">
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="spaced-element"
+            >
               <option value="pending">Pending</option>
               <option value="in progress">In Progress</option>
               <option value="completed">Completed</option>
@@ -415,17 +458,19 @@ useEffect(() => {
                 <button
                   onClick={handleAddTask}
                   disabled={!selectedMentor || !assignedTo}
-                   className="spaced-element"
+                  className="spaced-element"
                 >
                   Update Task
                 </button>
-                <button onClick={handleCancelEdit} className="spaced-element">Cancel</button>
+                <button onClick={handleCancelEdit} className="spaced-element">
+                  Cancel
+                </button>
               </>
             ) : (
               <button
                 onClick={handleAddTask}
-                  disabled={!selectedMentor || !assignedTo}
-                  className="spaced-element"
+                disabled={!selectedMentor || !assignedTo}
+                className="spaced-element"
               >
                 Add Task
               </button>
@@ -455,7 +500,8 @@ useEffect(() => {
               <div className="task-details">
                 <h4>{task.title || task.task}</h4>
                 <p>
-                  Assigned to: {getInternNameById(task.assignedTo || task.intern)}
+                  Assigned to:{" "}
+                  {getInternNameById(task.assignedTo || task.intern)}
                 </p>
                 <p>
                   Status:{" "}
@@ -467,7 +513,9 @@ useEffect(() => {
                     {formatStatus(task.status)}
                   </span>
                 </p>
-                <p>Assigned Date: {new Date(task.dueDate).toLocaleDateString()}</p>
+                <p>
+                  Assigned Date: {new Date(task.dueDate).toLocaleDateString()}
+                </p>
               </div>
               <div className="task-actions">
                 <button onClick={() => handleEdit(task._id)}>Edit</button>
@@ -479,7 +527,7 @@ useEffect(() => {
       </div>
       <button
         onClick={() => {
-          localStorage.removeItem('isLoggedIn');
+          localStorage.removeItem("isLoggedIn");
           window.location.reload();
         }}
         className="logout-button"
