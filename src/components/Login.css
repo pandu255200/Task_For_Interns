@@ -6,7 +6,7 @@
   justify-content: center;
   align-items: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #ffffff, #ffffff);
   animation: gradientShift 8s ease infinite;
   background-size: 200% 200%;
 }
@@ -16,11 +16,14 @@
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
-
+.logo{
+  width: 200px;
+  height: auto;
+}
 .login-container {
   max-width: 400px;
   padding: 30px 20px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(217, 186, 186, 0.2);
   border-radius: 16px;
   text-align: center;
   background: rgba(255, 255, 255, 0.15);
@@ -41,7 +44,7 @@
 
 .login-container h2 {
   margin-bottom: 20px;
-  color: #fff;
+  color: #ff4b4b;
   font-size: 24px;
   letter-spacing: 1px;
 }
@@ -54,19 +57,19 @@
   border-radius: 8px;
   border: none;
   outline: none;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(233, 194, 194, 0.9);
   transition: box-shadow 0.3s;
 }
 
 .login-container input:focus {
-  box-shadow: 0 0 5px #764ba2;
+  box-shadow: 0 0 5px #f92609;
 }
 
 .login-container button {
   width: 95%;
   padding: 12px;
-  background: linear-gradient(45deg, #ff6ec4, #7873f5);
-  color: white;
+  background: linear-gradient(45deg, #ff4b4b, #ff4b4b);
+  color: rgb(255, 255, 255);
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
@@ -76,7 +79,7 @@
 }
 
 .login-container button:hover {
-  background: linear-gradient(45deg, #ff6ec4, #6a5acd);
+  background: linear-gradient(45deg, #f92609, #f92609);
   transform: scale(1.03);
 }
 
@@ -113,7 +116,7 @@
   }
 
   .login-container input {
-    width: 85%;
+    width: 95%;
     padding: 10px;
     font-size: 14px;
     margin: 10px 0;

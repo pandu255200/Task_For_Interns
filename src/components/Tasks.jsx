@@ -5,11 +5,12 @@ import logo from "../components/logo.webp";
 import { Mic } from "lucide-react";
 import { Search } from "lucide-react";
 
+// const API_BASE = 'http://localhost:5000/api';
 const API_BASE = process.env.REACT_APP_API_BASE;
 
 
 const Task = () => {
-  // State hooks
+
   const [mentors, setMentors] = useState([]);
   const [allMembers, setAllMembers] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
@@ -340,7 +341,7 @@ const Task = () => {
 
       <div className="top-header">
         <h2>
-          Reporting to: <span className="report">Mr. Parikshit Bangde</span>
+        <span className="spanto"> Reporting to: </span><span className="report">Mr. Parikshit Bangde</span>
         </h2>
       </div>
 
@@ -385,7 +386,7 @@ const Task = () => {
       {selectedMentor && (
         <>
           <div className="section">
-            <h3>Team Members under Selected Mentor:</h3>
+            <h3><span className="teams">Team Members under Selected Mentor:</span></h3>
             <ul className="team-list">
               {teamMembers.map((member) => (
                 <li
@@ -479,7 +480,7 @@ const Task = () => {
 
       {/* Tasks list */}
       <div className="tasks-section">
-        <h3>Tasks List</h3>
+        <h3><span className="tasksmore">Tasks List</span></h3>
         {filteredTasks.length === 0 ? (
           <p>No tasks found.</p>
         ) : (
