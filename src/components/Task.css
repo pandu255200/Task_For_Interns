@@ -582,3 +582,94 @@ button:hover {
   }
 
 }
+
+
+
+
+.pulse-ring {
+  position: absolute;
+  border: 2px solid #ff0000;
+  border-radius: 50%;
+  animation: pulse 1.5s ease-out infinite;
+  opacity: 0;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.1, 0.1);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.2, 1.2);
+    opacity: 0;
+  }
+}
+
+
+
+/* For screens smaller than 768px (typical mobile devices) */
+@media (max-width: 768px) {
+  .voice-button {
+    padding: 8px; /* Smaller padding for mobile */
+    margin-left: -4px !important; /* Reduced negative margin */
+    width: 36px; /* Fixed width */
+    height: 36px; /* Fixed height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .voice-button svg {
+    size: 12px; /* Smaller icon */
+  }
+  
+  .pulse-ring {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/* For very small screens (under 480px) */
+@media (max-width: 480px) {
+  .voice-button {
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+  }
+  
+  .voice-button svg {
+    size: 10px;
+  }
+}
+
+
+
+@media (max-width: 768px) {
+  .voice-button {
+    position: relative;
+  }
+  
+  .voice-button::after {
+    content: "Microphone access required";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    background: #ffebee;
+    color: #c62828;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  
+  .voice-button:disabled:hover::after {
+    opacity: 1;
+  }
+}

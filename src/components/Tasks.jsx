@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 import axios from "axios";
 import "./Task.css";
 import logo from "../components/logo.webp";
 import { Mic } from "lucide-react";
 import { Search } from "lucide-react";
 
-// const API_BASE = 'http://localhost:5000/api';
-const API_BASE = process.env.REACT_APP_API_BASE;
+const API_BASE = 'http://localhost:5000/api';
+// const API_BASE = process.env.REACT_APP_API_BASE;
 
 
 const Task = () => {
@@ -250,7 +250,9 @@ const Task = () => {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   };
-  useEffect(() => {
+  const recognitionRef = useRef(null);
+
+useEffect(() => {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -258,7 +260,8 @@ const Task = () => {
       return;
     }
 
-    const recognition = new SpeechRecognition();
+    recognitionRef.current = new SpeechRecognition();
+    const recognition = recognitionRef.current;
     recognition.continuous = false;
     recognition.lang = "en-US";
     recognition.interimResults = false;
@@ -272,38 +275,53 @@ const Task = () => {
     recognition.onerror = (event) => {
       console.error("Speech recognition error", event.error);
       setListening(false);
-      alert(`Voice input error: ${event.error}`);
-    };
-
-    recognition.onend = () => {
-      setListening(false);
+      if (event.error === 'not-allowed') {
+        showPermissionError();
+      }
     };
 
     return () => {
       recognition.stop();
     };
-  }, []);
+}, []);
 
-  const handleVoiceInput = () => {
-    setListening(true);
-    recognition.start();
 
-    recognition.onresult = (event) => {
-      const voiceText = event.results[0][0].transcript;
-      setTaskInput(voiceText); // Set task input from voice
-      setListening(false);
-    };
-
-    recognition.onerror = (event) => {
-      console.error("Speech recognition error:", event.error);
-      setListening(false);
-    };
-
-    recognition.onend = () => {
-      setListening(false);
-    };
+  
+  const showPermissionError = () => {
+  if (window.innerWidth <= 768) { // Mobile devices
+    alert("Please enable microphone permissions in your browser settings to use voice input.");
+  } else {
+    alert("Please allow microphone access to use voice input.");
+  }
   };
+  
+  const checkMicrophonePermission = async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream.getTracks().forEach(track => track.stop());
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
 
+const handleVoiceInput = async () => {
+  if (!recognitionRef.current) return;
+  
+  const hasPermission = await checkMicrophonePermission();
+  if (!hasPermission) {
+    showPermissionError();
+    return;
+  }
+
+  setListening(true);
+  try {
+    recognitionRef.current.start();
+  } catch (err) {
+    console.error("Recognition start error:", err);
+    setListening(false);
+  }
+};
    const filteredTasks = tasks.filter((task) => {
     // Filter by mentor if selected
     if (selectedMentor) {
