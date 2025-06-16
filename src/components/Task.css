@@ -673,3 +673,123 @@ button:hover {
     opacity: 1;
   }
 }
+
+@media (max-width: 480px){
+  .logo {
+    /* font-size: 100px; */
+    display: block;
+    margin-left: auto;
+        width: 100px; 
+    margin-right: auto;
+  }
+}
+
+
+
+@media (max-width: 768px) {
+  .app-heading {
+ 
+   
+ 
+    font-size: 1.3rem; 
+    padding: 0 1rem; 
+  }
+}
+
+
+
+
+/* Due Date Styling */
+.task-details p:nth-last-child(2) { /* Targets the Due Date line specifically */
+  color: #555;
+  font-size: 0.9rem;
+  margin: 5px 0;
+}
+
+/* Style for when due date is approaching (within 3 days) */
+.due-date-warning {
+  color: #ff9800;
+  font-weight: bold;
+}
+
+/* Style for when due date is past */
+.due-date-overdue {
+  color: #f44336;
+  font-weight: bold;
+}
+
+/* Style for when due date is not set */
+.due-date-notset {
+  color: #9e9e9e;
+  font-style: italic;
+}
+
+/* Date picker input styling */
+input[type="date"] {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+  margin-right: 10px;
+}
+
+/* Highlight current date in date picker */
+input[type="date"]:focus {
+  border-color: #4CAF50;
+  outline: none;
+}
+
+/* Responsive date display */
+@media (max-width: 768px) {
+  .task-details p:nth-last-child(2) {
+    font-size: 0.8rem;
+  }
+}
+
+
+
+
+/* Notification Styles */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 20px;
+  border-radius: 4px;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 300px;
+  animation: slideIn 0.3s ease-out;
+}
+
+.notification.success {
+  background-color: #4CAF50;
+}
+
+.notification.error {
+  background-color: #f44336;
+}
+
+.notification-close {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

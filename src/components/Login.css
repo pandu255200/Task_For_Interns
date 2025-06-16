@@ -151,3 +151,20 @@
     font-size: 14px;
   }
 }
+
+
+
+.password-wrapper {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.toggle-visibility {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #555;
+  font-size: 0.9rem;
+}

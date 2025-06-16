@@ -1,0 +1,148 @@
+.intern-page {
+  padding: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+  background: #f5f5f5;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgb(0 0 0 / 0.1);
+  text-align: center;
+}
+
+.intern-page h2 {
+  color: #4caf50;
+  margin-bottom: 20px;
+}
+
+.intern-page form {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgb(0 0 0 / 0.05);
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+.intern-page form label {
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: #555;
+  display: block;
+}
+
+.intern-page form input[type='text'] {
+  padding: 10px;
+  width: 100%;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.intern-page form input[type='radio'] {
+  margin-right: 10px;
+}
+
+.intern-page form button {
+  padding: 10px 20px;
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.intern-page form button:disabled {
+  background: #888;
+  cursor: not-allowed;
+}
+
+.intern-page form button:hover:not(:disabled) {
+  background: #45a049;
+}
+
+.intern-page .history-button {
+  padding: 10px 20px;
+  background: #2196f3;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.intern-page .history-button:hover {
+  background: #0b79d0;
+}
+
+.intern-page .error {
+  color: #d32f2f;
+  margin-bottom: 15px;
+}
+
+.intern-page .success {
+  color: #4caf50;
+  margin-bottom: 15px;
+}
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #00000080;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgb(0 0 0 / 0.5);
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+}
+
+.modal-content h4 {
+  margin-bottom: 20px;
+}
+
+.modal-content table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modal-content table th,
+.modal-content table td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+.modal-content table tbody tr:hover {
+  background: #f5f5f5;
+}
+
+.close-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #f44336;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.close-button:hover {
+  background: #d32f2f;
+}

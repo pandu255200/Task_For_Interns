@@ -1,16 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import "./Task.css";
 import logo from "../components/logo.webp";
 import { Mic } from "lucide-react";
 import { Search } from "lucide-react";
 
-const API_BASE = 'http://localhost:5000/api';
+// const API_BASE = "http://localhost:5000/api";
 // const API_BASE = process.env.REACT_APP_API_BASE;
-
+const API_BASE = process.env.REACT_APP_API_BASE_URL;
+  const API_URL = 'http://localhost:5000'
 
 const Task = () => {
-
   const [mentors, setMentors] = useState([]);
   const [allMembers, setAllMembers] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
@@ -24,9 +24,11 @@ const Task = () => {
   const [animationMap, setAnimationMap] = useState({});
   const [listening, setListening] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
-
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dueDate1, setDueDate1] = useState("");
+const [showNotification, setShowNotification] = useState(false);
+const [notificationMessage, setNotificationMessage] = useState("");
+const [notificationType, setNotificationType] = useState(""); // 'success' or 'error'
   const startListening = () => {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -72,11 +74,30 @@ const Task = () => {
   recognition.continuous = false;
   recognition.lang = "en-US";
 
+
+  const AppNotification = ({ message, type, onClose }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div className={`notification ${type}`}>
+      {message}
+      <button onClick={onClose} className="notification-close">
+        ×
+      </button>
+    </div>
+  );
+};
+
   // Fetch mentors on mount
   useEffect(() => {
     const fetchMentors = async () => {
       try {
-        const res = await axios.get(`${API_BASE}/mentors`);
+        const res = await axios.get(`${API_BASE}/api/mentors`);
         setMentors(res.data);
       } catch (err) {
         console.error("Failed to fetch mentors", err);
@@ -86,46 +107,60 @@ const Task = () => {
   }, []);
 
   // Fetch all members on mount
-  useEffect(() => {
-    const fetchAllMembers = async () => {
-      try {
-        const res = await axios.get(`${API_BASE}/members`);
-        setAllMembers(res.data);
-      } catch (err) {
-        console.error("Failed to fetch members", err);
-      }
-    };
-    fetchAllMembers();
-  }, []);
-
-  // Filter team members when selected mentor or allMembers change
-  useEffect(() => {
-    if (!selectedMentor) {
-      setTeamMembers([]);
-      setSelectedIntern("");
-      return;
+ // Fetch all members on mount
+useEffect(() => {
+  const fetchAllMembers = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/api/members?populate=mentor`);
+      setAllMembers(res.data);
+      console.log('Fetched members:', res.data); // Debug log
+    } catch (err) {
+      console.error("Failed to fetch members", err);
     }
+  };
+  fetchAllMembers();
+}, []);
+  // Filter team members when selected mentor or allMembers change
+  // Filter team members when selected mentor or allMembers change
+useEffect(() => {
+  if (!selectedMentor) {
+    setTeamMembers([]);
+    setSelectedIntern('');
+    return;
+  }
 
-    const filtered = allMembers.filter((member) => {
-      const mentorId =
-        typeof member.mentor === "object" ? member.mentor._id : member.mentor;
-      return mentorId === selectedMentor;
-    });
+  const filtered = allMembers.filter((member) => {
+    if (!member || !member.mentor) {
+      console.warn('Member with null mentor:', member); // Debug log
+      return false;
+    }
+    
+    // Handle both populated mentor object and raw ID
+    const mentorId = typeof member.mentor === 'object' 
+      ? member.mentor._id 
+      : member.mentor;
+    
+    return mentorId === selectedMentor;
+  });
 
-    setTeamMembers(filtered);
-    // Reset task form states on mentor change
-    setTaskInput("");
-    setAssignedTo("");
-    setStatus("pending");
-    setEditingTaskId(null);
-    setSelectedIntern("");
-  }, [selectedMentor, allMembers]);
+  console.log('Filtered team members:', filtered); // Debug log
+  setTeamMembers(filtered);
+  
+  // Reset task form states
+  setTaskInput('');
+  setAssignedTo('');
+  setStatus('pending');
+  setEditingTaskId(null);
+  setSelectedIntern('');
+}, [selectedMentor, allMembers]);
+
+
 
   // Fetch tasks on mount
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const res = await axios.get(`${API_BASE}/tasks`);
+        const res = await axios.get(`${API_BASE}/api/tasks`);
         setTasks(res.data);
       } catch (err) {
         console.error("Failed to fetch tasks", err);
@@ -142,29 +177,39 @@ const Task = () => {
         setTaskInput(taskToEdit.title || taskToEdit.task); // handle naming difference
         setAssignedTo(taskToEdit.assignedTo || taskToEdit.intern);
         setStatus(taskToEdit.status);
-        setSelectedIntern(taskToEdit.assignedTo || taskToEdit.intern);
+        setSelectedIntern(getAssignedName(taskToEdit));
+        setDueDate1(
+          taskToEdit.dueDate1 ? taskToEdit.dueDate1.split("T")[0] : ""
+        );
       }
     } else {
       setTaskInput("");
       setAssignedTo("");
       setStatus("pending");
       setSelectedIntern("");
+      setDueDate1("");
     }
   }, [editingTaskId, tasks]);
 
   // Add or update task handler
   const handleAddTask = async () => {
-    if (!taskInput.trim() || !assignedTo) return;
+    if (!taskInput.trim() || !assignedTo) {
+    setNotificationMessage("Please fill all required fields");
+    setNotificationType("error");
+    setShowNotification(true);
+    return;
+  }
     const newDate = new Date().toISOString();
 
     try {
       if (editingTaskId !== null) {
         // Update existing task
-        const res = await axios.put(`${API_BASE}/tasks/${editingTaskId}`, {
+        const res = await axios.put(`${API_BASE}/api/tasks/${editingTaskId}`, {
           title: taskInput.trim(),
           assignedTo,
           status,
           dueDate: newDate,
+          dueDate1: dueDate1 || new Date().toISOString(),
         });
         setTasks((prev) =>
           prev.map((t) => (t._id === editingTaskId ? res.data : t))
@@ -177,27 +222,59 @@ const Task = () => {
         alert("✅ Task updated!");
       } else {
         // Add new task
-        const res = await axios.post(`${API_BASE}/tasks`, {
+        const res = await axios.post(`${API_BASE}/api/tasks`, {
           title: taskInput.trim(),
           assignedTo,
           status,
           dueDate: newDate,
+          dueDate1: dueDate1 || new Date().toISOString(),
         });
         setTasks((prev) => [res.data, ...prev]);
         setAnimationMap((prev) => ({ ...prev, [res.data._id]: "animate-add" }));
         alert("🎉 Task added!");
       }
+       setNotificationMessage(
+      editingTaskId ? "✅ Task updated!" : "🎉 Task added!"
+    );
+    setNotificationType("success");
+    setShowNotification(true);
+
+    // Browser notification if supported
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification(
+        editingTaskId ? "Task Updated" : "New Task Added",
+        {
+          body: taskInput.trim(),
+          icon: logo
+        }
+      );
+    }
 
       // Reset form inputs
       setTaskInput("");
       setAssignedTo("");
       setStatus("pending");
     } catch (err) {
-      alert("Error saving task");
-      console.error(err);
+      setNotificationMessage("Error saving task");
+    setNotificationType("error");
+    setShowNotification(true);
+    console.error(err);
     }
   };
-
+useEffect(() => {
+  if ("Notification" in window && window.Notification) {
+    window.Notification.requestPermission().then(permission => {
+      console.log("Notification permission:", permission);
+    });
+  }
+}, []);
+const showSystemNotification = (title, options) => {
+  if ("Notification" in window && 
+      window.Notification && 
+      window.Notification.permission === "granted") {
+    new window.Notification(title, options);
+  }
+};
   // Delete task handler with animation
   const handleDelete = (id) => {
     if (editingTaskId === id) setEditingTaskId(null);
@@ -205,7 +282,7 @@ const Task = () => {
     setAnimationMap((prev) => ({ ...prev, [id]: "animate-delete" }));
     setTimeout(async () => {
       try {
-        await axios.delete(`${API_BASE}/tasks/${id}`);
+        await axios.delete(`${API_BASE}/api/tasks/${id}`);
         setTasks((tasks) => tasks.filter((task) => task._id !== id));
         setAnimationMap((prev) => {
           const updated = { ...prev };
@@ -233,7 +310,6 @@ const Task = () => {
   };
 
   // Filter tasks based on selected mentor and intern
-  
 
   // Helper: get intern name by _id or name (fallback)
   const getInternNameById = (idOrName) => {
@@ -241,6 +317,25 @@ const Task = () => {
       (member) => member._id === idOrName || member.name === idOrName
     );
     return intern ? intern.name : idOrName;
+  };
+  function getInternNameByIdd(id) {
+    const member = teamMembers.find((m) => m._id === id);
+    return member ? member.name : "Unknown";
+  }
+  // Replace getInternNameByIdd with this simpler version
+  const getAssignedName = (task) => {
+    // First check if assignedTo is a populated object
+    if (task.assignedTo && typeof task.assignedTo === "object") {
+      return task.assignedTo.name;
+    }
+
+    // Then check in teamMembers
+    const teamMember = teamMembers.find((m) => m._id === task.assignedTo);
+    if (teamMember) return teamMember.name;
+
+    // Finally check in allMembers as fallback
+    const allMember = allMembers.find((m) => m._id === task.assignedTo);
+    return allMember ? allMember.name : "Unassigned";
   };
 
   // Format status text with capitalized words
@@ -252,7 +347,7 @@ const Task = () => {
   };
   const recognitionRef = useRef(null);
 
-useEffect(() => {
+  useEffect(() => {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -275,7 +370,7 @@ useEffect(() => {
     recognition.onerror = (event) => {
       console.error("Speech recognition error", event.error);
       setListening(false);
-      if (event.error === 'not-allowed') {
+      if (event.error === "not-allowed") {
         showPermissionError();
       }
     };
@@ -283,51 +378,57 @@ useEffect(() => {
     return () => {
       recognition.stop();
     };
-}, []);
+  }, []);
 
-
-  
   const showPermissionError = () => {
-  if (window.innerWidth <= 768) { // Mobile devices
-    alert("Please enable microphone permissions in your browser settings to use voice input.");
-  } else {
-    alert("Please allow microphone access to use voice input.");
-  }
+    if (window.innerWidth <= 768) {
+      // Mobile devices
+      alert(
+        "Please enable microphone permissions in your browser settings to use voice input."
+      );
+    } else {
+      alert("Please allow microphone access to use voice input.");
+    }
   };
-  
+
   const checkMicrophonePermission = async () => {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    stream.getTracks().forEach(track => track.stop());
-    return true;
-  } catch (err) {
-    return false;
-  }
-};
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((track) => track.stop());
+      return true;
+    } catch (err) {
+      return false;
+    }
+  };
 
-const handleVoiceInput = async () => {
-  if (!recognitionRef.current) return;
-  
-  const hasPermission = await checkMicrophonePermission();
-  if (!hasPermission) {
-    showPermissionError();
-    return;
-  }
+  const handleVoiceInput = async () => {
+    if (!recognitionRef.current) return;
 
-  setListening(true);
-  try {
-    recognitionRef.current.start();
-  } catch (err) {
-    console.error("Recognition start error:", err);
-    setListening(false);
-  }
-};
-   const filteredTasks = tasks.filter((task) => {
+    const hasPermission = await checkMicrophonePermission();
+    if (!hasPermission) {
+      showPermissionError();
+      return;
+    }
+
+    setListening(true);
+    try {
+      recognitionRef.current.start();
+    } catch (err) {
+      console.error("Recognition start error:", err);
+      setListening(false);
+    }
+  };
+ const filteredTasks = tasks.filter((task) => {
+    // Get the assigned ID (handling both object and string cases)
+    const taskAssignedTo = typeof task.assignedTo === 'object' 
+      ? task.assignedTo._id 
+      : task.assignedTo;
+
     // Filter by mentor if selected
     if (selectedMentor) {
-      const teamMemberIds = teamMembers.map((m) => m._id);
-      const taskAssignedTo = task.assignedTo || task.intern;
+      const teamMemberIds = teamMembers.map(member => member._id);
       
+      // Check if task is assigned to any team member
       if (!teamMemberIds.includes(taskAssignedTo)) return false;
 
       // Filter by selected intern if any
@@ -339,64 +440,73 @@ const handleVoiceInput = async () => {
 
     // Filter by search term if any
     if (searchTerm) {
-      const internName = getInternNameById(task.assignedTo || task.intern);
-      const taskTitle = task.title || task.task;
+      const internName = getAssignedName(task).toLowerCase();
+      const taskTitle = (task.title || task.task).toLowerCase();
+      const dueDate = task.dueDate1 
+        ? new Date(task.dueDate1).toLocaleDateString().toLowerCase() 
+        : '';
       
       return (
-        internName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        taskTitle.toLowerCase().includes(searchTerm.toLowerCase())
+        internName.includes(searchTerm.toLowerCase()) ||
+        taskTitle.includes(searchTerm.toLowerCase()) ||
+        dueDate.includes(searchTerm.toLowerCase())
       );
     }
 
     return true;
-  });
-  
+  })
 
   return (
     <div className="task-container">
+      {showNotification && (
+  <AppNotification  // Changed from Notification
+    message={notificationMessage}
+    type={notificationType}
+    onClose={() => setShowNotification(false)}
+  />
+)}
       <img src={logo} alt="ResoluteAI" className="logo" />
       <h1 className="app-heading">Interns Task Management Application</h1>
 
       <div className="top-header">
         <h2>
-        <span className="spanto"> Reporting to: </span><span className="report">Mr. Parikshit Bangde</span>
+          <span className="spanto"> Reporting to: </span>
+          <span className="report">Mr. Parikshit Bangde</span>
         </h2>
       </div>
 
       {/* Mentor selection */}
       <div className="section">
-         <div className="filter-section">
-        {/* Mentor selection */}
-        <div className="section mentor-select">
-          <label htmlFor="mentor-select">Select Mentor:</label>
-          <select
-            id="mentor-select"
-            value={selectedMentor}
-            onChange={(e) => setSelectedMentor(e.target.value)}
-          >
-            <option value="">-- Select Mentor --</option>
-            {mentors.map((mentor) => (
-              <option key={mentor._id} value={mentor._id}>
-                {mentor.name}
-              </option>
-            ))}
-          </select>
+        <div className="filter-section">
+          {/* Mentor selection */}
+          <div className="section mentor-select">
+            <label htmlFor="mentor-select">Select Mentor:</label>
+            <select
+              id="mentor-select"
+              value={selectedMentor}
+              onChange={(e) => setSelectedMentor(e.target.value)}
+            >
+              <option value="">-- Select Mentor --</option>
+              {mentors.map((mentor) => (
+                <option key={mentor._id} value={mentor._id}>
+                  {mentor.name}
+                </option>
+              ))}
+            </select>
           </div>
-          </div>
-        
+        </div>
       </div>
       <div className="section search-box">
-          <label htmlFor="task-search">Search Tasks:</label>
-          <div className="search-container">
-            <input
-              id="task-search"
-              type="text"
-              placeholder="Search by member name or task..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <Search className="search-icon" size={18} />
-         
+        <label htmlFor="task-search">Search Tasks:</label>
+        <div className="search-container">
+          <input
+            id="task-search"
+            type="text"
+            placeholder="Search by member name or task..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <Search className="search-icon" size={18} />
         </div>
       </div>
 
@@ -404,7 +514,9 @@ const handleVoiceInput = async () => {
       {selectedMentor && (
         <>
           <div className="section">
-            <h3><span className="teams">Team Members under Selected Mentor:</span></h3>
+            <h3>
+              <span className="teams">Team Members under Selected Mentor:</span>
+            </h3>
             <ul className="team-list">
               {teamMembers.map((member) => (
                 <li
@@ -459,6 +571,13 @@ const handleVoiceInput = async () => {
                 </option>
               ))}
             </select>
+            <input
+              type="date"
+              value={dueDate1}
+              onChange={(e) => setDueDate1(e.target.value)}
+              className="spaced-element"
+              min={new Date().toISOString().split("T")[0]} // Prevent selecting past dates
+            />
 
             <select
               value={status}
@@ -498,7 +617,9 @@ const handleVoiceInput = async () => {
 
       {/* Tasks list */}
       <div className="tasks-section">
-        <h3><span className="tasksmore">Tasks List</span></h3>
+        <h3>
+          <span className="tasksmore">Tasks List</span>
+        </h3>
         {filteredTasks.length === 0 ? (
           <p>No tasks found.</p>
         ) : (
@@ -516,10 +637,7 @@ const handleVoiceInput = async () => {
             >
               <div className="task-details">
                 <h4>{task.title || task.task}</h4>
-                <p>
-                  Assigned to:{" "}
-                  {getInternNameById(task.assignedTo || task.intern)}
-                </p>
+                <p>Assigned to: {getAssignedName(task)}</p>
                 <p>
                   Status:{" "}
                   <span
@@ -532,6 +650,12 @@ const handleVoiceInput = async () => {
                 </p>
                 <p>
                   Assigned Date: {new Date(task.dueDate).toLocaleDateString()}
+                </p>
+                <p>
+                  Due Date:{" "}
+                  {task.dueDate1
+                    ? new Date(task.dueDate1).toLocaleDateString()
+                    : "Not set"}
                 </p>
               </div>
               <div className="task-actions">
