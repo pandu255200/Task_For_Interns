@@ -64,10 +64,17 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL;
         })
       });
 
-      if (!res.ok) {
-        const errorMsg = await res.text();
-        throw new Error(errorMsg);
-      }
+     if (!res.ok) {
+  const { error } = await res.json();
+
+  if (error === "Attendance already marked for this date") {
+    setMarkSuccess("✅ Attendance already marked for today.");
+    return;
+  }
+
+  throw new Error(error || "Something went wrong.");
+}
+
 
       const data = await res.json();
 
