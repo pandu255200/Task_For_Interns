@@ -8,7 +8,7 @@ const InternTasksPage = () => {
   const [updating, setUpdating] = useState(false);
   const [updateError, setUpdateError] = useState(null);
   
-  // Retrieve the memberId from localStorage
+
     const memberId = localStorage.getItem("userId");
     const API_BASE = process.env.REACT_APP_API_BASE_URL;
   const API_URL = 'http://localhost:5000'
@@ -23,16 +23,16 @@ const InternTasksPage = () => {
     setLoading(true);
     setError(null);
     try {
-      // Filter by assignedTo == memberId
+     
       const res = await fetch(`${API_BASE}/api/tasks`);
 
       if (!res.ok) {
-        throw new Error(await res.text()); // or res.json()
+        throw new Error(await res.text()); 
       }
 
       const data = await res.json();
 
-      // Filter tasks for this member
+     
       const memberTasks = data.filter(
         (task) => task.assignedTo?._id === memberId
       );
@@ -45,7 +45,7 @@ const InternTasksPage = () => {
     }
   };
 
-  // Update task status
+  
   const handleStatusChange = async (taskId, newStatus) => {
     setUpdating(true);
     setUpdateError(null);
@@ -59,10 +59,10 @@ const InternTasksPage = () => {
       });
 
       if (!res.ok) {
-        throw new Error(await res.text()); // or res.json()
+        throw new Error(await res.text()); 
       }
 
-      // Update the task in state
+     
       setTasks((tasks) =>
         tasks.map((task) =>
           task._id === taskId ? { ...task, status: newStatus } : task
@@ -90,21 +90,21 @@ const InternTasksPage = () => {
           <li key={task._id} className="task-item">
             <h4>{task.title}</h4>
             <p>{task.description}</p>
-            <p>Status: {task.status}</p>
-            <p>Due Date: {new Date(task.dueDate).toLocaleDateString()}</p>
+          <div className="task-meta-row">
+    <span className="statuss">Status: {task.status}</span>
+    <span className="dues">Due Date: {new Date(task.dueDate).toLocaleDateString()}</span>
 
-            {/* Update status select box */}
-            <select
-              disabled={updating}
-              value={task.status}
-              onChange={(e) =>
-                handleStatusChange(task._id, e.target.value)
-              }
-            >
-              <option value="Pending">Pending</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Completed">Completed</option>
-            </select>
+    <select
+      className="selection"
+      disabled={updating}
+      value={task.status}
+      onChange={(e) => handleStatusChange(task._id, e.target.value)}
+    >
+      <option value="Pending">Pending</option>
+      <option value="In Progress">In Progress</option>
+      <option value="Completed">Completed</option>
+    </select>
+  </div>
           </li>
         ))}
       </ul>

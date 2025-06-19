@@ -420,10 +420,12 @@ const showSystemNotification = (title, options) => {
   };
  const filteredTasks = tasks.filter((task) => {
     // Get the assigned ID (handling both object and string cases)
-    const taskAssignedTo = typeof task.assignedTo === 'object' 
-      ? task.assignedTo._id 
+   const taskAssignedTo = 
+  task.assignedTo === null || task.assignedTo === undefined
+    ? undefined
+    : typeof task.assignedTo === 'object'
+      ? task.assignedTo._id
       : task.assignedTo;
-
     // Filter by mentor if selected
     if (selectedMentor) {
       const teamMemberIds = teamMembers.map(member => member._id);
@@ -465,7 +467,7 @@ const showSystemNotification = (title, options) => {
     onClose={() => setShowNotification(false)}
   />
 )}
-      <img src={logo} alt="ResoluteAI" className="logo" />
+      {/* <img src={logo} alt="ResoluteAI" className="logo" /> */}
       <h1 className="app-heading">Interns Task Management Application</h1>
 
       <div className="top-header">

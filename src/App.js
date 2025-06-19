@@ -7,6 +7,9 @@ import Reports from './components/Reports';
 import InternPage from './components/InternPage';
 // import InternTasksPage from './components/InternTasksPage';
 import InternTasksPage from './components/InternsTasks';
+import logo from './components/logo.webp'
+import './App.css'
+import UpdatePassword from './components/UpdatePass';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -44,20 +47,27 @@ const App = () => {
           role === 'admin' ? (
             <>
               {/* Navbar for admin */}
-              <nav style={styles.nav}>
-                <button onClick={() => setCurrentPage('attendance')} style={styles.button}>
-                    Attendance
-                </button>
-                <button onClick={() => setCurrentPage('tasks')} style={styles.button}>
-                    Tasks
-                </button>
-                <button onClick={() => setCurrentPage('reports')} style={styles.button}>
-                    Reports
-                </button>
-                <button onClick={handleLogout} style={styles.logoutButton}>
-                    Logout
-                </button>
-              </nav>
+             <nav style={styles.nav}>
+  {/* Logo to the left */}
+  <img src={logo} alt="Logo" style={styles.logo} />
+
+  {/* Buttons centered */}
+  <div style={styles.navButtons}>
+    <button onClick={() => setCurrentPage('attendance')} style={styles.button}>
+      Attendance
+    </button>
+    <button onClick={() => setCurrentPage('tasks')} style={styles.button}>
+      Tasks
+    </button>
+    <button onClick={() => setCurrentPage('reports')} style={styles.button}>
+      Reports
+    </button>
+    <button onClick={handleLogout} style={styles.logoutButton}>
+      Logout
+    </button>
+  </div>
+</nav>
+
 
               {/* Main content for admin */}
               {currentPage === 'attendance' && <AttendancePage />}
@@ -67,22 +77,33 @@ const App = () => {
           ) : (
             // If the role is not admin, show InternPage with routing
             <>
-              <nav style={styles.nav}>
-                <Link to="/intern" style={styles.link}>
-                    Attendance
-                </Link>
-                <Link to="/intern/tasks" style={styles.link}>
-                    My Tasks
-                </Link>
-                <button onClick={handleLogout} style={styles.logoutButton}>
-                    Logout
-                </button>
-              </nav>
+<nav className="navbar">
+  {/* Logo to the left */}
+  <img src={logo} alt="Logo" className="logos" />
+
+  {/* Links centered */}
+  <div className="nav-links">
+    <Link to="/intern" className="link">
+      Attendance
+    </Link>
+    <Link to="/intern/tasks" className="link">
+      My Tasks
+    </Link>
+    <Link to="/update-password" className="link">
+      Profile
+    </Link>
+    <button onClick={handleLogout} className="logout-button">
+      Logout
+    </button>
+  </div>
+</nav>
+
 
               {/* Intern routes */}
               <Routes>
                 <Route path="/intern" element={<InternPage />} />
-                <Route path="/intern/tasks" element={<InternTasksPage />} />
+                  <Route path="/intern/tasks" element={<InternTasksPage />} />
+                   <Route path="/update-password" element={<UpdatePassword />} />
               </Routes>
             </>
           )
@@ -98,15 +119,26 @@ const App = () => {
 const styles = {
   nav: {
     display: 'flex',
-    justifyContent: 'center',
-    gap: '15px',
+    alignItems: 'center',
     padding: '10px',
     backgroundColor: '#f1f1f1',
+  },
+  logo: {
+    width: '130px',
+    height: '45px',
+    marginRight: 'auto', // Push everything else toward the center
+  },
+  navButtons: {
+    display: 'flex',
+    gap: '15px',
+    margin: '0 auto',
+    alignItems: 'center',
+     marginLeft: '2%',
   },
   button: {
     padding: '8px 16px',
     cursor: 'pointer',
-    backgroundColor: '#1976d2',
+    backgroundColor: '#f44336',
     color: '#fff',
     border: 'none',
     borderRadius: '4px',
@@ -114,7 +146,7 @@ const styles = {
   },
   link: {
     padding: '8px 16px',
-    backgroundColor: '#d32f2f',
+    backgroundColor: '#f44336',
     color: '#fff',
     border: 'none',
     borderRadius: '4px',
@@ -125,13 +157,16 @@ const styles = {
   },
   logoutButton: {
     padding: '8px 16px',
-    backgroundColor: '#d32f2f',
+    backgroundColor: '#f44336',
     color: '#fff',
     border: 'none',
     borderRadius: '4px',
     margin: '10px',
     cursor: 'pointer',
   },
+  
 };
+
+
 
 export default App;

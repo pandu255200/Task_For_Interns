@@ -41,7 +41,7 @@
 
 .message {
   text-align: center;
-  color: green;
+  color: rgb(0, 0, 0);
   font-weight: bold;
 }
 
@@ -68,7 +68,7 @@
 
 .message.success {
   background-color: #d4edda;
-  color: #155724;
+  color: #000000;
 }
 
 .message.error {
@@ -191,4 +191,19 @@ input[type="checkbox"] {
   background-color: #e9ecef;
   color: #888;
   cursor: not-allowed;
+}
+
+
+
+.color-legend {
+  margin-bottom: 20px;
+}
+
+.color-legend span {
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.joins{
+  text-align: left;
 }

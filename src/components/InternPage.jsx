@@ -8,18 +8,18 @@ const InternPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
-  // Attendance submission states
+ 
   const [markPresent, setMarkPresent] = useState(true);
   const [leaveReason, setLeaveReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [markSuccess, setMarkSuccess] = useState(null);
 
   const memberId = localStorage.getItem('userId');
-  const token = localStorage.getItem('token'); // if you need authentication
-  const name = localStorage.getItem('name'); // user's name
+  const token = localStorage.getItem('token');
+  const name = localStorage.getItem('name'); 
 const API_BASE = process.env.REACT_APP_API_BASE_URL;
   const API_URL = 'http://localhost:5000'
-  //Fetch attendance history
+  
   const fetchAttendance = async () => {
     setLoading(true);
     setError(null);
@@ -42,7 +42,7 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL;
     }
   };
 
-  // Handle attendance submission
+ 
   const handleMarkAttendance = async (e) => {
     e.preventDefault();
 
@@ -84,7 +84,7 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL;
 
   return (
     <div className="intern-page">
-      <h2>Welcome {name ? name : 'Intern'}</h2>
+      <h2 className='intern-name'>Welcome {name ? name : 'Intern'}</h2>
 
       {/* Attendance Submission Section */}
       <h3>Mark Your Attendance</h3>
@@ -166,9 +166,7 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL;
             <button className="close-button" onClick={() => setShowAttendance(false)}>Close</button>
                   </div>
                   <Link to="/intern/tasks">
-      <button className="tasks-button">
-        View My Tasks
-      </button>
+     
     </Link>
         </div>
       )}

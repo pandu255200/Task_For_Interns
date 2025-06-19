@@ -1,6 +1,6 @@
 .intern-tasks-page {
   padding: 20px;
-  max-width: 500px;
+  max-width: 1000px;
   margin: 0 auto;
   background: #f5f5f5;
   border-radius: 12px;
@@ -9,16 +9,17 @@
 }
 
 .intern-tasks-page h2 {
-  color: #4caf50;
+  color: #000000;
   margin-bottom: 20px;
+  font-size: 1.5rem;
 }
 
-.intern-tasks-page .tasks-list {
+.tasks-list {
   list-style: none;
   padding: 0;
 }
 
-.intern-tasks-page .tasks-list .task-item {
+.task-item {
   background: #fff;
   padding: 20px;
   border-radius: 12px;
@@ -28,16 +29,47 @@
   transition: transform 0.3s ease-in-out;
 }
 
-.intern-tasks-page .tasks-list .task-item:hover {
+.task-item:hover {
   transform: translateY(-5px);
 }
 
-.intern-tasks-page .tasks-list .task-item h4 {
-  color: #2196f3;
+.task-item h4 {
+  color: #171616;
   margin-bottom: 10px;
+  font-size: 1.2rem;
 }
 
-.intern-tasks-page .tasks-list .task-item p {
+.task-item p {
   color: #555;
-  margin-bottom: 5px;
+  font-size: 1rem;
+  margin-top: 10px;
 }
+
+/* Flex row for status, due date, and dropdown */
+.task-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-top: 15px;
+  gap: 10px;
+}
+
+.statuss,
+.dues {
+  font-size: 0.9rem;
+  color: #333;
+  flex: 1;
+  min-width: 150px;
+}
+
+.selection {
+  padding: 6px 12px;
+  border: 1px solid #868b8a;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.9rem;
+  min-width: 180px;
+}
+
+
