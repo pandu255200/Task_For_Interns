@@ -79,85 +79,91 @@ useEffect(() => {
 
   const COLORS = ["#4caf50", "#ff9800", "#f44336"];
 
-  return (
-    <div className="reports-container">
-      <h1>All Teams Task Report</h1>
-
-      <div className="charts-wrapper">
-        <div className="charts">
-          <h2>Task Distribution</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={pieData}
-                dataKey="value"
-                nameKey="name"
-                outerRadius={100}
-                label
-              >
-                {pieData.map((entry, index) => (
+ return (
+  <div className="reports-container">
+    <div className="report-sections-wrapper">
+      
+      {/* Team Report */}
+      <div className="team-report">
+        <h1>Teams Task Report</h1>
+        <div className="charts-wrapper">
+          {/* Pie Chart */}
+          <div className="charts1">
+            <h2>Task Distribution</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  dataKey="value"
+                  nameKey="name"
+                  outerRadius={100}
+                  label
+                >
+                  {pieData.map((entry, index) => (
                     <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Legend />
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+                  ))}
+                </Pie>
+                <Legend />
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
 
-        <div className="charts">
-          <h2>Task Count</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={barData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis allowDecimals={false} />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="count" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
+          {/* Bar Chart */}
+          <div className="charts1">
+            <h2>Task Count</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={barData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="count" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
 
-      <h1>Individual Task Report</h1>
+      {/* Individual Report */}
+      <div className="individual-report">
+        <h1>Individual Task Report</h1>
+        <select
+          value={selectedMemberId}
+          onChange={(e) => setSelectedMemberId(e.target.value)}
+          style={{ padding: "8px", marginBottom: "20px" }}
+        >
+          <option value="">Select Member</option>
+          {members
+            .filter((member) => member.role === "intern")
+            .map((member) => (
+              <option key={member._id} value={member._id}>
+                {member.name}
+              </option>
+            ))}
+        </select>
 
-     <select
-  value={selectedMemberId}
-  onChange={(e) => setSelectedMemberId(e.target.value)}
-  style={{ padding: "8px", marginBottom: "20px" }}>
-  <option value="">Select Member</option>
-  {members
-    .filter((member) => member.role === "intern") // <- Filter for interns
-    .map((member) => (
-      <option key={member._id} value={member._id}>
-        {member.name}
-      </option>
-    ))}
-</select>
-
-      {selectedMemberId && (
-        <div className="individual-report">
-          {/* Charts for Individual */}
+        {selectedMemberId && (
           <div className="charts-wrapper">
             {/* Pie Chart */}
             <div className="charts">
               <h2>Individual Task Distribution</h2>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
-                    <Pie
-                      data={pieMemberData}
-                      dataKey="value"
-                      nameKey="name"
-                      outerRadius={100}
-                      label
-                    >
+                  <Pie
+                    data={pieMemberData}
+                    dataKey="value"
+                    nameKey="name"
+                    outerRadius={100}
+                    label
+                  >
                     {pieMemberData.map((entry, index) => (
-                        <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                      <Cell key={index} fill={COLORS[index % COLORS.length]} />
                     ))}
-                    </Pie>
-                    <Legend />
-                    <Tooltip />
+                  </Pie>
+                  <Legend />
+                  <Tooltip />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -167,24 +173,22 @@ useEffect(() => {
               <h2>Individual Task Count</h2>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={barMemberData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis allowDecimals={false} />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="count" fill="#8884d8" />
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="count" fill="#8884d8" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
-
-          {/* Individual Task List by Status */}
-        
-        </div>
-      )}
-
+        )}
+      </div>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default Reports;
