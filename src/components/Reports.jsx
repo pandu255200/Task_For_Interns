@@ -148,7 +148,7 @@ useEffect(() => {
           <div className="charts-wrapper">
             {/* Pie Chart */}
             <div className="charts">
-              <h2>Individual Task Distribution</h2>
+              <h2>Task Distribution</h2>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -170,7 +170,7 @@ useEffect(() => {
 
             {/* Bar Chart */}
             <div className="charts">
-              <h2>Individual Task Count</h2>
+              <h2>Task Count</h2>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={barMemberData}>
                   <CartesianGrid strokeDasharray="3 3" />
