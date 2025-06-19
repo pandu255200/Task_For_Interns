@@ -53,3 +53,61 @@
 .logout-button:hover {
   background: #f44336;
 }
+
+
+/* Mobile styles (max-width: 768px) */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 15px 10px;
+    flex-direction: column;
+    align-items: stretch;
+    position: relative;
+    height: auto;
+  }
+
+  .logos {
+    position: static;
+    width: 140px;
+    height: 50px;
+    margin: 0 auto 10px auto;
+    align-self: center;
+  }
+
+  .nav-links {
+    width: 100%;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+  }
+
+  .link,
+  .logout-button {
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .logout-button {
+    margin-top: 10px;
+    order: 1; /* Move logout to bottom */
+  }
+}
+
+/* Extra small devices (320px-480px) */
+@media (max-width: 480px) {
+  .navbar {
+    padding: 12px 8px;
+  }
+
+  .logos {
+    width: 120px;
+    height: 40px;
+  }
+
+  .link,
+  .logout-button {
+    padding: 8px;
+    font-size: 13px;
+  }
+}
