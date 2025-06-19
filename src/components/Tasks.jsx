@@ -8,7 +8,7 @@ import { Search } from "lucide-react";
 // const API_BASE = "http://localhost:5000/api";
 // const API_BASE = process.env.REACT_APP_API_BASE;
 const API_BASE = process.env.REACT_APP_API_BASE_URL;
-  const API_URL = 'http://localhost:5000'
+const API_URL = "http://localhost:5000";
 
 const Task = () => {
   const [mentors, setMentors] = useState([]);
@@ -26,8 +26,8 @@ const Task = () => {
   const [voiceSupported, setVoiceSupported] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [dueDate1, setDueDate1] = useState("");
-const [showNotification, setShowNotification] = useState(false);
-const [notificationMessage, setNotificationMessage] = useState("");
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
   const [notificationType, setNotificationType] = useState(""); // 'success' or 'error'
   const [notificationSupported, setNotificationSupported] = useState(true);
   const startListening = () => {
@@ -75,30 +75,29 @@ const [notificationMessage, setNotificationMessage] = useState("");
   recognition.continuous = false;
   recognition.lang = "en-US";
 
+  const AppNotification = ({ message, type, onClose }) => {
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        onClose();
+      }, 3000);
+      return () => clearTimeout(timer);
+    }, [onClose]);
 
- const AppNotification = ({ message, type, onClose }) => {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onClose();
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [onClose]);
+    return (
+      <div className={`notification ${type}`}>
+        <span className="notification-message">{message}</span>
+        <button onClick={onClose} className="notification-close">
+          ×
+        </button>
+      </div>
+    );
+  };
 
-  return (
-     <div className={`notification ${type}`}>
-      <span className="notification-message">{message}</span>
-      <button onClick={onClose} className="notification-close">
-        ×
-      </button>
-    </div>
-  );
-};
-  
   const showAppNotification = (message, type) => {
-  setNotificationMessage(message);
-  setNotificationType(type);
-  setShowNotification(true);
-};
+    setNotificationMessage(message);
+    setNotificationType(type);
+    setShowNotification(true);
+  };
 
   // Fetch mentors on mount
   useEffect(() => {
@@ -114,54 +113,51 @@ const [notificationMessage, setNotificationMessage] = useState("");
   }, []);
 
   // Fetch all members on mount
- // Fetch all members on mount
-useEffect(() => {
-  const fetchAllMembers = async () => {
-    try {
-      const res = await axios.get(`${API_BASE}/api/members?populate=mentor`);
-      setAllMembers(res.data);
-      console.log('Fetched members:', res.data); // Debug log
-    } catch (err) {
-      console.error("Failed to fetch members", err);
-    }
-  };
-  fetchAllMembers();
-}, []);
+  // Fetch all members on mount
+  useEffect(() => {
+    const fetchAllMembers = async () => {
+      try {
+        const res = await axios.get(`${API_BASE}/api/members?populate=mentor`);
+        setAllMembers(res.data);
+        console.log("Fetched members:", res.data); // Debug log
+      } catch (err) {
+        console.error("Failed to fetch members", err);
+      }
+    };
+    fetchAllMembers();
+  }, []);
   // Filter team members when selected mentor or allMembers change
   // Filter team members when selected mentor or allMembers change
-useEffect(() => {
-  if (!selectedMentor) {
-    setTeamMembers([]);
-    setSelectedIntern('');
-    return;
-  }
-
-  const filtered = allMembers.filter((member) => {
-    if (!member || !member.mentor) {
-      console.warn('Member with null mentor:', member); // Debug log
-      return false;
+  useEffect(() => {
+    if (!selectedMentor) {
+      setTeamMembers([]);
+      setSelectedIntern("");
+      return;
     }
-    
-    // Handle both populated mentor object and raw ID
-    const mentorId = typeof member.mentor === 'object' 
-      ? member.mentor._id 
-      : member.mentor;
-    
-    return mentorId === selectedMentor;
-  });
 
-  console.log('Filtered team members:', filtered); // Debug log
-  setTeamMembers(filtered);
-  
-  // Reset task form states
-  setTaskInput('');
-  setAssignedTo('');
-  setStatus('pending');
-  setEditingTaskId(null);
-  setSelectedIntern('');
-}, [selectedMentor, allMembers]);
+    const filtered = allMembers.filter((member) => {
+      if (!member || !member.mentor) {
+        console.warn("Member with null mentor:", member); // Debug log
+        return false;
+      }
 
+      // Handle both populated mentor object and raw ID
+      const mentorId =
+        typeof member.mentor === "object" ? member.mentor._id : member.mentor;
 
+      return mentorId === selectedMentor;
+    });
+
+    console.log("Filtered team members:", filtered); // Debug log
+    setTeamMembers(filtered);
+
+    // Reset task form states
+    setTaskInput("");
+    setAssignedTo("");
+    setStatus("pending");
+    setEditingTaskId(null);
+    setSelectedIntern("");
+  }, [selectedMentor, allMembers]);
 
   // Fetch tasks on mount
   useEffect(() => {
@@ -202,11 +198,11 @@ useEffect(() => {
   const handleAddTask = async () => {
     if (!taskInput.trim() || !assignedTo) {
       setNotificationMessage("Please fill all required fields");
-       showAppNotification("Please fill all required fields", "error");
-    setNotificationType("error");
-    setShowNotification(true);
-    return;
-  }
+      showAppNotification("Please fill all required fields", "error");
+      setNotificationType("error");
+      setShowNotification(true);
+      return;
+    }
     const newDate = new Date().toISOString();
 
     try {
@@ -228,10 +224,10 @@ useEffect(() => {
         }));
         setEditingTaskId(null);
         alert("✅ Task updated!");
-         showAppNotification(
-      editingTaskId ? "✅ Task updated!" : "🎉 Task added!",
-      "success"
-    );
+        showAppNotification(
+          editingTaskId ? "✅ Task updated!" : "🎉 Task added!",
+          "success"
+        );
       } else {
         // Add new task
         const res = await axios.post(`${API_BASE}/api/tasks`, {
@@ -245,14 +241,14 @@ useEffect(() => {
         setAnimationMap((prev) => ({ ...prev, [res.data._id]: "animate-add" }));
         alert("🎉 Task added!");
       }
-       setNotificationMessage(
-      editingTaskId ? "✅ Task updated!" : "🎉 Task added!"
-    );
-    setNotificationType("success");
+      setNotificationMessage(
+        editingTaskId ? "✅ Task updated!" : "🎉 Task added!"
+      );
+      setNotificationType("success");
       setShowNotification(true);
-       showAppNotification(
-      editingTaskId ? "✅ Task updated!" : "🎉 Task added!",
-      "success"
+      showAppNotification(
+        editingTaskId ? "✅ Task updated!" : "🎉 Task added!",
+        "success"
       );
       if (notificationSupported && window.innerWidth > 768) {
         showSystemNotification(
@@ -261,18 +257,13 @@ useEffect(() => {
         );
       }
 
-    // Browser notification if supported
-    if ("Notification" in window && Notification.permission === "granted") {
-      new Notification(
-        editingTaskId ? "Task Updated" : "New Task Added",
-        {
+      // Browser notification if supported
+      if ("Notification" in window && Notification.permission === "granted") {
+        new Notification(editingTaskId ? "Task Updated" : "New Task Added", {
           body: taskInput.trim(),
-          icon: logo
-        }
-      );
-      
+          icon: logo,
+        });
       }
-      
 
       // Reset form inputs
       setTaskInput("");
@@ -281,42 +272,42 @@ useEffect(() => {
     } catch (err) {
       setNotificationMessage("Error saving task");
       showAppNotification("Error saving task", "error");
-    setNotificationType("error");
-    setShowNotification(true);
-    console.error(err);
+      setNotificationType("error");
+      setShowNotification(true);
+      console.error(err);
     }
-  };
-useEffect(() => {
-  if ("Notification" in window && window.Notification) {
-    window.Notification.requestPermission().then(permission => {
-      console.log("Notification permission:", permission);
-    });
-  }
-}, []);
-const showSystemNotification = (title, options) => {
-  if (!("Notification" in window)) {
-    showAppNotification(title, 'info');
-    return;
-  }
-
-  if (Notification.permission === "granted") {
-    new Notification(title, options);
-  } else if (Notification.permission !== "denied") {
-    // Don't automatically request on mobile
-    if (window.innerWidth > 768) {
-      Notification.requestPermission().then(permission => {
-        if (permission === "granted") {
-          new Notification(title, options);
-        }
-      });
-    }
-  }
   };
   useEffect(() => {
-  if (!("Notification" in window)) {
-    setNotificationSupported(false);
-  }
-}, []);
+    if ("Notification" in window && window.Notification) {
+      window.Notification.requestPermission().then((permission) => {
+        console.log("Notification permission:", permission);
+      });
+    }
+  }, []);
+  const showSystemNotification = (title, options) => {
+    if (!("Notification" in window)) {
+      showAppNotification(title, "info");
+      return;
+    }
+
+    if (Notification.permission === "granted") {
+      new Notification(title, options);
+    } else if (Notification.permission !== "denied") {
+      // Don't automatically request on mobile
+      if (window.innerWidth > 768) {
+        Notification.requestPermission().then((permission) => {
+          if (permission === "granted") {
+            new Notification(title, options);
+          }
+        });
+      }
+    }
+  };
+  useEffect(() => {
+    if (!("Notification" in window)) {
+      setNotificationSupported(false);
+    }
+  }, []);
   // Delete task handler with animation
   const handleDelete = (id) => {
     if (editingTaskId === id) setEditingTaskId(null);
@@ -460,18 +451,18 @@ const showSystemNotification = (title, options) => {
       setListening(false);
     }
   };
- const filteredTasks = tasks.filter((task) => {
+  const filteredTasks = tasks.filter((task) => {
     // Get the assigned ID (handling both object and string cases)
-   const taskAssignedTo = 
-  task.assignedTo === null || task.assignedTo === undefined
-    ? undefined
-    : typeof task.assignedTo === 'object'
-      ? task.assignedTo._id
-      : task.assignedTo;
+    const taskAssignedTo =
+      task.assignedTo === null || task.assignedTo === undefined
+        ? undefined
+        : typeof task.assignedTo === "object"
+        ? task.assignedTo._id
+        : task.assignedTo;
     // Filter by mentor if selected
     if (selectedMentor) {
-      const teamMemberIds = teamMembers.map(member => member._id);
-      
+      const teamMemberIds = teamMembers.map((member) => member._id);
+
       // Check if task is assigned to any team member
       if (!teamMemberIds.includes(taskAssignedTo)) return false;
 
@@ -486,10 +477,10 @@ const showSystemNotification = (title, options) => {
     if (searchTerm) {
       const internName = getAssignedName(task).toLowerCase();
       const taskTitle = (task.title || task.task).toLowerCase();
-      const dueDate = task.dueDate1 
-        ? new Date(task.dueDate1).toLocaleDateString().toLowerCase() 
-        : '';
-      
+      const dueDate = task.dueDate1
+        ? new Date(task.dueDate1).toLocaleDateString().toLowerCase()
+        : "";
+
       return (
         internName.includes(searchTerm.toLowerCase()) ||
         taskTitle.includes(searchTerm.toLowerCase()) ||
@@ -498,50 +489,49 @@ const showSystemNotification = (title, options) => {
     }
 
     return true;
-  })
+  });
 
   return (
-    
     <div className="task-container">
-       <div style={{ textAlign: 'center', margin: '15px 0' }}>
-  {notificationSupported && (
-    <button 
-      onClick={async () => {
-        try {
-          const permission = await Notification.requestPermission();
-          showAppNotification(
-            permission === 'granted' 
-              ? 'Browser notifications enabled!' 
-              : 'Notifications blocked',
-            permission === 'granted' ? 'success' : 'error'
-          );
-        } catch (error) {
-          showAppNotification('Failed to enable notifications', 'error');
-        }
-      }}
-      style={{
-        background: '#2196F3',
-        color: 'white',
-        border: 'none',
-        padding: '8px 16px',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        fontSize: '14px',
-        display: 'inline-block'
-      }}
-    >
-      Enable Browser Notifications
-    </button>
-  )}
-</div>
-  
+      <div style={{ textAlign: "left", margin: "10px 0" }}>
+        {notificationSupported && (
+          <button
+            onClick={async () => {
+              try {
+                const permission = await Notification.requestPermission();
+                showAppNotification(
+                  permission === "granted"
+                    ? "Browser notifications enabled!"
+                    : "Notifications blocked",
+                  permission === "granted" ? "success" : "error"
+                );
+              } catch (error) {
+                showAppNotification("Failed to enable notifications", "error");
+              }
+            }}
+            style={{
+              background: "#2196F3",
+              color: "white",
+              border: "none",
+              padding: "8px 16px",
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontSize: "14px",
+              display: "inline-block",
+            }}
+          >
+            Enable Browser Notifications
+          </button>
+        )}
+      </div>
+
       {showNotification && (
-  <AppNotification  // Changed from Notification
-    message={notificationMessage}
-    type={notificationType}
-    onClose={() => setShowNotification(false)}
-  />
-)}
+        <AppNotification // Changed from Notification
+          message={notificationMessage}
+          type={notificationType}
+          onClose={() => setShowNotification(false)}
+        />
+      )}
       {/* <img src={logo} alt="ResoluteAI" className="logo" /> */}
       <h1 className="app-heading">Interns Task Management Application</h1>
 
