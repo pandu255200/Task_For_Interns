@@ -747,49 +747,110 @@ input[type="date"]:focus {
 }
 
 
-
-
-/* Notification Styles */
+/* Notification styles */
 .notification {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 15px 20px;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
   border-radius: 4px;
   color: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;
+  max-width: 80%;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: 300px;
   animation: slideIn 0.3s ease-out;
 }
 
+.notification-message {
+  font-size: 14px;
+  max-width: calc(100% - 30px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notification-close {
+  margin-left: 10px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Notification type colors */
 .notification.success {
   background-color: #4CAF50;
 }
 
 .notification.error {
-  background-color: #f44336;
+  background-color: #F44336;
 }
 
-.notification-close {
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 20px;
-  cursor: pointer;
-  margin-left: 10px;
+.notification.info {
+  background-color: #2196F3;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  .notification {
+    width: 90%;
+    padding: 10px 15px;
+    max-width: 90%;
+  }
+  
+  .notification-message {
+    font-size: 13px;
+    white-space: normal;
+  }
 }
 
 @keyframes slideIn {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
+  from { bottom: -50px; opacity: 0; }
+  to { bottom: 20px; opacity: 1; }
+}
+
+/* Notification permission button */
+
+/* Prevent any inherited styles from affecting the button */
+.enable-notifications-btn {
+  all: initial;
+  font-family: inherit;
+  /* Now reapply our styles */
+  background: #2196F3;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  margin: 10px 0;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-block;
+}
+/* Mobile-specific button styles */
+@media (max-width: 768px) {
+  .enable-notifications-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+    max-width: 200px;
   }
 }
+
+.notification-permission-container {
+  background: transparent;
+  padding: 0;
+  margin: 15px 0;
+  border: none;
+}
+
+/* Remove any full-width styles that might be affecting it */

@@ -28,7 +28,8 @@ const Task = () => {
   const [dueDate1, setDueDate1] = useState("");
 const [showNotification, setShowNotification] = useState(false);
 const [notificationMessage, setNotificationMessage] = useState("");
-const [notificationType, setNotificationType] = useState(""); // 'success' or 'error'
+  const [notificationType, setNotificationType] = useState(""); // 'success' or 'error'
+  const [notificationSupported, setNotificationSupported] = useState(true);
   const startListening = () => {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -75,7 +76,7 @@ const [notificationType, setNotificationType] = useState(""); // 'success' or 'e
   recognition.lang = "en-US";
 
 
-  const AppNotification = ({ message, type, onClose }) => {
+ const AppNotification = ({ message, type, onClose }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
@@ -84,13 +85,19 @@ const [notificationType, setNotificationType] = useState(""); // 'success' or 'e
   }, [onClose]);
 
   return (
-    <div className={`notification ${type}`}>
-      {message}
+     <div className={`notification ${type}`}>
+      <span className="notification-message">{message}</span>
       <button onClick={onClose} className="notification-close">
         ×
       </button>
     </div>
   );
+};
+  
+  const showAppNotification = (message, type) => {
+  setNotificationMessage(message);
+  setNotificationType(type);
+  setShowNotification(true);
 };
 
   // Fetch mentors on mount
@@ -194,7 +201,8 @@ useEffect(() => {
   // Add or update task handler
   const handleAddTask = async () => {
     if (!taskInput.trim() || !assignedTo) {
-    setNotificationMessage("Please fill all required fields");
+      setNotificationMessage("Please fill all required fields");
+       showAppNotification("Please fill all required fields", "error");
     setNotificationType("error");
     setShowNotification(true);
     return;
@@ -220,6 +228,10 @@ useEffect(() => {
         }));
         setEditingTaskId(null);
         alert("✅ Task updated!");
+         showAppNotification(
+      editingTaskId ? "✅ Task updated!" : "🎉 Task added!",
+      "success"
+    );
       } else {
         // Add new task
         const res = await axios.post(`${API_BASE}/api/tasks`, {
@@ -237,7 +249,17 @@ useEffect(() => {
       editingTaskId ? "✅ Task updated!" : "🎉 Task added!"
     );
     setNotificationType("success");
-    setShowNotification(true);
+      setShowNotification(true);
+       showAppNotification(
+      editingTaskId ? "✅ Task updated!" : "🎉 Task added!",
+      "success"
+      );
+      if (notificationSupported && window.innerWidth > 768) {
+        showSystemNotification(
+          editingTaskId ? "Task Updated" : "New Task Added",
+          { body: taskInput.trim() }
+        );
+      }
 
     // Browser notification if supported
     if ("Notification" in window && Notification.permission === "granted") {
@@ -248,7 +270,9 @@ useEffect(() => {
           icon: logo
         }
       );
-    }
+      
+      }
+      
 
       // Reset form inputs
       setTaskInput("");
@@ -256,6 +280,7 @@ useEffect(() => {
       setStatus("pending");
     } catch (err) {
       setNotificationMessage("Error saving task");
+      showAppNotification("Error saving task", "error");
     setNotificationType("error");
     setShowNotification(true);
     console.error(err);
@@ -269,12 +294,29 @@ useEffect(() => {
   }
 }, []);
 const showSystemNotification = (title, options) => {
-  if ("Notification" in window && 
-      window.Notification && 
-      window.Notification.permission === "granted") {
-    new window.Notification(title, options);
+  if (!("Notification" in window)) {
+    showAppNotification(title, 'info');
+    return;
   }
-};
+
+  if (Notification.permission === "granted") {
+    new Notification(title, options);
+  } else if (Notification.permission !== "denied") {
+    // Don't automatically request on mobile
+    if (window.innerWidth > 768) {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          new Notification(title, options);
+        }
+      });
+    }
+  }
+  };
+  useEffect(() => {
+  if (!("Notification" in window)) {
+    setNotificationSupported(false);
+  }
+}, []);
   // Delete task handler with animation
   const handleDelete = (id) => {
     if (editingTaskId === id) setEditingTaskId(null);
@@ -459,7 +501,40 @@ const showSystemNotification = (title, options) => {
   })
 
   return (
+    
     <div className="task-container">
+       <div style={{ textAlign: 'center', margin: '15px 0' }}>
+  {notificationSupported && (
+    <button 
+      onClick={async () => {
+        try {
+          const permission = await Notification.requestPermission();
+          showAppNotification(
+            permission === 'granted' 
+              ? 'Browser notifications enabled!' 
+              : 'Notifications blocked',
+            permission === 'granted' ? 'success' : 'error'
+          );
+        } catch (error) {
+          showAppNotification('Failed to enable notifications', 'error');
+        }
+      }}
+      style={{
+        background: '#2196F3',
+        color: 'white',
+        border: 'none',
+        padding: '8px 16px',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        fontSize: '14px',
+        display: 'inline-block'
+      }}
+    >
+      Enable Browser Notifications
+    </button>
+  )}
+</div>
+  
       {showNotification && (
   <AppNotification  // Changed from Notification
     message={notificationMessage}
