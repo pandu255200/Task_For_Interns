@@ -106,6 +106,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: auto;
   z-index: 1000;
 }
 
@@ -114,10 +115,16 @@
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0 0 30px rgb(0 0 0 / 0.5);
+  max-height: 90vh; /* limit height */
+  overflow-y: auto;
   max-width: 500px;
   width: 90%;
   position: relative;
 }
+.modal-content {
+  scroll-behavior: smooth;
+}
+
 
 .modal-content h4 {
   margin-bottom: 20px;

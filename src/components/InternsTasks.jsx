@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./TasksPage.css";
+import "./styles/TasksPage.css";
 
 const InternTasksPage = () => {
   const [tasks, setTasks] = useState([]);
@@ -11,7 +11,7 @@ const InternTasksPage = () => {
 
     const memberId = localStorage.getItem("userId");
     const API_BASE = process.env.REACT_APP_API_BASE_URL;
-  const API_URL = 'http://localhost:5000'
+  // const API_URL = 'http://localhost:5000'
 
   useEffect(() => {
     if (memberId) {

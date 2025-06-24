@@ -1,6 +1,12 @@
+
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./styles/InternPage.css";
+
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import './styles/InternPage.css';
+
 
 const InternPage = () => {
   const [attendance, setAttendance] = useState([]);
@@ -12,10 +18,15 @@ const InternPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [markSuccess, setMarkSuccess] = useState(null);
 
+
   const memberId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
   const name = localStorage.getItem("name");
   const API_BASE = process.env.REACT_APP_API_BASE_URL;
+
+ 
+
+
   const fetchAttendance = async () => {
     setLoading(true);
     setError(null);
@@ -48,22 +59,22 @@ const InternPage = () => {
     setError(null);
 
     try {
-      const res = await fetch(
-        `${API_BASE}/api/members/${memberId}/attendance`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            date: new Date().toISOString(),
-            present: markPresent,
-            leaveReason: leaveReason.trim(),
-            status: "pending",
-          }),
-        }
-      );
+
+    
+      const res = await fetch(`${API_BASE}/api/members/${memberId}/attendance`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          date: new Date().toISOString(),
+          present: markPresent,
+          leaveReason: leaveReason.trim(),
+          status: "pending"
+        })
+      });
+
 
       const responseData = await res.json();
 
@@ -75,9 +86,13 @@ const InternPage = () => {
         throw new Error(responseData.error || "Something went wrong.");
       }
 
+
       setMarkSuccess(
         "✅ Attendance marked successfully and sent for mentor approval."
       );
+
+      setMarkSuccess('✅ Attendance marked successfully and sent for mentor approval.');
+
       setAttendance(responseData.attendance);
       setMarkPresent(true);
       setLeaveReason("");
@@ -92,8 +107,12 @@ const InternPage = () => {
     fetchAttendance();
   }, []);
 
-  const hasMarkedToday = attendance?.some(
-    (entry) => new Date(entry.date).toDateString() === new Date().toDateString()
+
+
+
+  const hasMarkedToday = attendance?.some(entry =>
+    new Date(entry.date).toDateString() === new Date().toDateString()
+
   );
 
   return (
@@ -133,18 +152,26 @@ const InternPage = () => {
           {!markPresent && (
             <input
               type="text"
-              placeholder="Reason for absence"
+
+              placeholder='Reason for absence'
+
               value={leaveReason}
               onChange={(e) => setLeaveReason(e.target.value)}
               required
             />
           )}
 
+
           <button disabled={submitting} type="submit">
             {submitting ? "Submitting..." : "Submit"}
+
+          <button disabled={submitting} type='submit'>
+            {submitting ? 'Submitting...' : 'Submit'}
+
           </button>
         </form>
       )}
+
 
       <button
         className="history-button"
@@ -153,6 +180,9 @@ const InternPage = () => {
           fetchAttendance();
         }}
       >
+=======
+      <button className="history-button" onClick={() => { setShowAttendance(true); fetchAttendance(); }}>
+
         View Attendance History
       </button>
 
@@ -180,7 +210,7 @@ const InternPage = () => {
                       <td>{new Date(item.date).toLocaleDateString()}</td>
                       <td>{item.present ? "Yes" : "No"}</td>
                       <td>{item.leaveReason || "-"}</td>
-                      <td>
+                      
                         {item.status === "approved" && (
                           <span className="status approved">Approved</span>
                         )}
@@ -190,6 +220,14 @@ const InternPage = () => {
                         {item.status === "pending" && (
                           <span className="status pending">Pending</span>
                         )}
+
+                      <td>{item.present ? 'Yes' : 'No'}</td>
+                      <td>{item.leaveReason || '-'}</td>
+                      <td>
+                        {item.status === 'approved' && <span className="status approved">Approved</span>}
+                        {item.status === 'rejected' && <span className="status rejected">Rejected</span>}
+                        {item.status === 'pending' && <span className="status pending">Pending</span>}
+
                       </td>
                     </tr>
                   ))}
@@ -197,12 +235,16 @@ const InternPage = () => {
               </table>
             )}
 
+
             <button
               className="close-button"
               onClick={() => setShowAttendance(false)}
             >
               Close
             </button>
+
+            <button className="close-button" onClick={() => setShowAttendance(false)}>Close</button>
+
             <Link to="/intern/tasks" />
           </div>
         </div>

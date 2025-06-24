@@ -1,0 +1,362 @@
+/* === General App Container === */
+.task-container {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+  background: linear-gradient(120deg, #ffffff, #ffffff);
+  min-height: 100vh;
+  color: #333;
+}
+
+/* === Heading === */
+.app-heading {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: #f92609;
+}
+
+/* === Top Header (Logo + Reporting Info) === */
+.top-header {
+  /* font-size: 1rem; */
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 25px;
+  background: linear-gradient(to right, #ffffff, #f8f9ff);
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 50, 0.1);
+}
+.spanto {
+  font-size: 1.2rem;
+  color:#f92609
+}
+
+
+.report {
+  color: #000000;
+  font-weight: bold;
+}
+
+/* === Form Section === */
+.section {
+  margin-bottom: 20px;
+}
+
+.section label,
+.section h3 {
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: block;
+  color: #f92609;
+}
+.teams{
+  font-size: 1rem;
+}
+
+input[type="text"],
+select {
+  padding: 10px;
+  border: 1px solid #868b8a;
+  border-radius: 8px;
+  width: 250px;
+  margin-right: 10px;
+  background: #fff;
+  font-size: 14px;
+}
+
+button {
+  padding: 10px 15px;
+  background: linear-gradient(135deg, #f92609, #f92609);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+button:hover {
+  background: linear-gradient(135deg, #f92609, #f92609);
+  transform: scale(1.05);
+}
+
+/* === Team Member List === */
+.team-list {
+  list-style: none;
+  padding-left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.team-list li {
+  background: #ffffff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.team-list li:hover {
+  background: #acb5be;
+}
+
+
+/* === Responsive Fixes === */
+@media (max-width: 768px) {
+  .top-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .section input,
+  .section select {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .team-list {
+    flex-direction: column;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 8px;
+  }
+}
+
+
+
+
+.logout-button {
+  background-color: #ff4d4d;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logout-button:hover {
+  background-color: #f92609;
+  transform: scale(1.03);
+}
+
+.logout-button:active {
+  transform: scale(0.98);
+}
+
+
+.status-label {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: capitalize;
+  display: inline-block;
+}
+
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-in-progress {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.status-completed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+
+
+/* === Tasks Section === */
+
+/* === Task Actions (Edit/Delete buttons) === */
+
+
+
+
+/* === Status Labels === */
+
+
+/* === Animations === */
+
+/* === Responsive Fixes === */
+@media (max-width: 768px) {
+  .top-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .section input,
+  .section select {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .team-list {
+    flex-direction: column;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+ 
+}
+
+
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: linear-gradient(145deg, #ffffff, #ffffff);
+  border: 1px solid #ccddee;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 50, 0.1);
+  transition: all 0.3s ease;
+}
+
+.task-details {
+  flex-grow: 1;
+  margin-right: 20px;
+}
+
+.task-details h4 {
+  margin-bottom: 8px;
+  color: #0a0909;
+  font-size: 1.2rem;
+}
+
+.task-details p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+/* Buttons stacked vertically */
+
+
+
+
+
+
+
+/* Add these styles to your existing CSS */
+/* Existing styles */
+.filter-section {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.mentor-select {
+  flex: 1;
+  min-width: 250px;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 250px;
+}
+
+.search-container {
+  position: relative;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 8px 30px 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.search-icon {
+  position: absolute;
+  right: 90px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #f92609;
+  pointer-events: none;
+}
+
+/* Responsive styles for smaller screens */
+@media (max-width: 768px) {
+  .filter-section {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .mentor-select,
+  .search-box {
+    min-width: 100%;
+    width: 100%;
+  }
+
+  .search-container input {
+    width: 90%;
+    padding: 10px 35px 10px 15px;
+    font-size: 14px;
+  }
+
+  .search-icon {
+    right: 150px;
+  }
+
+  
+
+  /* Adjust voice button position */
+
+}
+
+/* Extra small devices (phones, 480px and down) */
+@media (max-width: 480px) {
+  .search-container input {
+    padding: 8px 30px 8px 12px;
+  }
+
+  .search-icon {
+    right: 20px;
+  }
+
+}
+
+
+
+
+
+
+
+
+/* Date picker input styling */
+input[type="date"] {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+  margin-right: 10px;
+}
+
+/* Highlight current date in date picker */
+input[type="date"]:focus {
+  border-color: #4CAF50;
+  outline: none;
+}
+
+/* Responsive date display */
+@media (max-width: 768px) {
+  .task-details p:nth-last-child(2) {
+    font-size: 0.8rem;
+  }
+}

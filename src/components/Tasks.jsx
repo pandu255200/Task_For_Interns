@@ -1,14 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import "./Task.css";
-import logo from "../components/logo.webp";
-import { Mic } from "lucide-react";
+import "./styles/Task.css";
 import { Search } from "lucide-react";
 
-// const API_BASE = "http://localhost:5000/api";
-// const API_BASE = process.env.REACT_APP_API_BASE;
 const API_BASE = process.env.REACT_APP_API_BASE_URL;
-const API_URL = "http://localhost:5000";
 
 const Task = () => {
   const [mentors, setMentors] = useState([]);
@@ -16,10 +11,10 @@ const Task = () => {
   const [teamMembers, setTeamMembers] = useState([]);
   const [selectedMentor, setSelectedMentor] = useState("");
   const [selectedIntern, setSelectedIntern] = useState("");
-  const [tasks, setTasks] = useState([]);
   const [taskInput, setTaskInput] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
   const [status, setStatus] = useState("pending");
+  const [tasks, setTasks] = useState([]);
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [animationMap, setAnimationMap] = useState({});
   const [listening, setListening] = useState(false);
@@ -28,52 +23,10 @@ const Task = () => {
   const [dueDate1, setDueDate1] = useState("");
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
-  const [notificationType, setNotificationType] = useState(""); // 'success' or 'error'
+  const [notificationType, setNotificationType] = useState("");
   const [notificationSupported, setNotificationSupported] = useState(true);
-  const startListening = () => {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert("Voice input is not supported in your browser");
-      return;
-    }
 
-    const recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.lang = "en-US";
-    recognition.interimResults = false;
-
-    recognition.onstart = () => {
-      setListening(true);
-    };
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      setTaskInput(transcript);
-      setListening(false);
-    };
-
-    recognition.onerror = (event) => {
-      console.error("Speech recognition error", event.error);
-      setListening(false);
-    };
-
-    recognition.onend = () => {
-      setListening(false);
-    };
-
-    try {
-      recognition.start();
-    } catch (err) {
-      console.error("Failed to start recognition:", err);
-      setListening(false);
-    }
-  };
-  const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
-  const recognition = new SpeechRecognition();
-  recognition.continuous = false;
-  recognition.lang = "en-US";
+  const recognitionRef = useRef(null);
 
   const AppNotification = ({ message, type, onClose }) => {
     useEffect(() => {
@@ -99,7 +52,6 @@ const Task = () => {
     setShowNotification(true);
   };
 
-  // Fetch mentors on mount
   useEffect(() => {
     const fetchMentors = async () => {
       try {
@@ -112,22 +64,18 @@ const Task = () => {
     fetchMentors();
   }, []);
 
-  // Fetch all members on mount
-  // Fetch all members on mount
   useEffect(() => {
     const fetchAllMembers = async () => {
       try {
         const res = await axios.get(`${API_BASE}/api/members?populate=mentor`);
         setAllMembers(res.data);
-        console.log("Fetched members:", res.data); // Debug log
       } catch (err) {
         console.error("Failed to fetch members", err);
       }
     };
     fetchAllMembers();
   }, []);
-  // Filter team members when selected mentor or allMembers change
-  // Filter team members when selected mentor or allMembers change
+
   useEffect(() => {
     if (!selectedMentor) {
       setTeamMembers([]);
@@ -137,21 +85,16 @@ const Task = () => {
 
     const filtered = allMembers.filter((member) => {
       if (!member || !member.mentor) {
-        console.warn("Member with null mentor:", member); // Debug log
+        console.warn("Member with null mentor:", member);
         return false;
       }
 
-      // Handle both populated mentor object and raw ID
       const mentorId =
         typeof member.mentor === "object" ? member.mentor._id : member.mentor;
-
       return mentorId === selectedMentor;
     });
 
-    console.log("Filtered team members:", filtered); // Debug log
     setTeamMembers(filtered);
-
-    // Reset task form states
     setTaskInput("");
     setAssignedTo("");
     setStatus("pending");
@@ -159,7 +102,6 @@ const Task = () => {
     setSelectedIntern("");
   }, [selectedMentor, allMembers]);
 
-  // Fetch tasks on mount
   useEffect(() => {
     const fetchTasks = async () => {
       try {
@@ -172,12 +114,11 @@ const Task = () => {
     fetchTasks();
   }, []);
 
-  // When editingTaskId changes, populate the form with task details or reset
   useEffect(() => {
     if (editingTaskId !== null) {
       const taskToEdit = tasks.find((t) => t._id === editingTaskId);
       if (taskToEdit) {
-        setTaskInput(taskToEdit.title || taskToEdit.task); // handle naming difference
+        setTaskInput(taskToEdit.title || taskToEdit.task);
         setAssignedTo(taskToEdit.assignedTo || taskToEdit.intern);
         setStatus(taskToEdit.status);
         setSelectedIntern(getAssignedName(taskToEdit));
@@ -193,192 +134,6 @@ const Task = () => {
       setDueDate1("");
     }
   }, [editingTaskId, tasks]);
-
-  // Add or update task handler
-  const handleAddTask = async () => {
-    if (!taskInput.trim() || !assignedTo) {
-      setNotificationMessage("Please fill all required fields");
-      showAppNotification("Please fill all required fields", "error");
-      setNotificationType("error");
-      setShowNotification(true);
-      return;
-    }
-    const newDate = new Date().toISOString();
-
-    try {
-      if (editingTaskId !== null) {
-        // Update existing task
-        const res = await axios.put(`${API_BASE}/api/tasks/${editingTaskId}`, {
-          title: taskInput.trim(),
-          assignedTo,
-          status,
-          dueDate: newDate,
-          dueDate1: dueDate1 || new Date().toISOString(),
-        });
-        setTasks((prev) =>
-          prev.map((t) => (t._id === editingTaskId ? res.data : t))
-        );
-        setAnimationMap((prev) => ({
-          ...prev,
-          [editingTaskId]: "animate-update",
-        }));
-        setEditingTaskId(null);
-        alert("✅ Task updated!");
-        showAppNotification(
-          editingTaskId ? "✅ Task updated!" : "🎉 Task added!",
-          "success"
-        );
-      } else {
-        // Add new task
-        const res = await axios.post(`${API_BASE}/api/tasks`, {
-          title: taskInput.trim(),
-          assignedTo,
-          status,
-          dueDate: newDate,
-          dueDate1: dueDate1 || new Date().toISOString(),
-        });
-        setTasks((prev) => [res.data, ...prev]);
-        setAnimationMap((prev) => ({ ...prev, [res.data._id]: "animate-add" }));
-        alert("🎉 Task added!");
-      }
-      setNotificationMessage(
-        editingTaskId ? "✅ Task updated!" : "🎉 Task added!"
-      );
-      setNotificationType("success");
-      setShowNotification(true);
-      showAppNotification(
-        editingTaskId ? "✅ Task updated!" : "🎉 Task added!",
-        "success"
-      );
-      if (notificationSupported && window.innerWidth > 768) {
-        showSystemNotification(
-          editingTaskId ? "Task Updated" : "New Task Added",
-          { body: taskInput.trim() }
-        );
-      }
-
-      // Browser notification if supported
-      if ("Notification" in window && Notification.permission === "granted") {
-        new Notification(editingTaskId ? "Task Updated" : "New Task Added", {
-          body: taskInput.trim(),
-          icon: logo,
-        });
-      }
-
-      // Reset form inputs
-      setTaskInput("");
-      setAssignedTo("");
-      setStatus("pending");
-    } catch (err) {
-      setNotificationMessage("Error saving task");
-      showAppNotification("Error saving task", "error");
-      setNotificationType("error");
-      setShowNotification(true);
-      console.error(err);
-    }
-  };
-  useEffect(() => {
-    if ("Notification" in window && window.Notification) {
-      window.Notification.requestPermission().then((permission) => {
-        console.log("Notification permission:", permission);
-      });
-    }
-  }, []);
-  const showSystemNotification = (title, options) => {
-    if (!("Notification" in window)) {
-      showAppNotification(title, "info");
-      return;
-    }
-
-    if (Notification.permission === "granted") {
-      new Notification(title, options);
-    } else if (Notification.permission !== "denied") {
-      // Don't automatically request on mobile
-      if (window.innerWidth > 768) {
-        Notification.requestPermission().then((permission) => {
-          if (permission === "granted") {
-            new Notification(title, options);
-          }
-        });
-      }
-    }
-  };
-  useEffect(() => {
-    if (!("Notification" in window)) {
-      setNotificationSupported(false);
-    }
-  }, []);
-  // Delete task handler with animation
-  const handleDelete = (id) => {
-    if (editingTaskId === id) setEditingTaskId(null);
-
-    setAnimationMap((prev) => ({ ...prev, [id]: "animate-delete" }));
-    setTimeout(async () => {
-      try {
-        await axios.delete(`${API_BASE}/api/tasks/${id}`);
-        setTasks((tasks) => tasks.filter((task) => task._id !== id));
-        setAnimationMap((prev) => {
-          const updated = { ...prev };
-          delete updated[id];
-          return updated;
-        });
-        alert("🗑️ Task deleted!");
-      } catch (err) {
-        alert("Failed to delete task");
-        console.error(err);
-      }
-    }, 400);
-  };
-
-  // Start editing a task
-  const handleEdit = (id) => setEditingTaskId(id);
-
-  // Cancel editing task
-  const handleCancelEdit = () => setEditingTaskId(null);
-
-  // Helper: get intern _id by their name
-  const getInternIdByName = (name) => {
-    const intern = teamMembers.find((member) => member.name === name);
-    return intern ? intern._id : "";
-  };
-
-  // Filter tasks based on selected mentor and intern
-
-  // Helper: get intern name by _id or name (fallback)
-  const getInternNameById = (idOrName) => {
-    const intern = allMembers.find(
-      (member) => member._id === idOrName || member.name === idOrName
-    );
-    return intern ? intern.name : idOrName;
-  };
-  function getInternNameByIdd(id) {
-    const member = teamMembers.find((m) => m._id === id);
-    return member ? member.name : "Unknown";
-  }
-  // Replace getInternNameByIdd with this simpler version
-  const getAssignedName = (task) => {
-    // First check if assignedTo is a populated object
-    if (task.assignedTo && typeof task.assignedTo === "object") {
-      return task.assignedTo.name;
-    }
-
-    // Then check in teamMembers
-    const teamMember = teamMembers.find((m) => m._id === task.assignedTo);
-    if (teamMember) return teamMember.name;
-
-    // Finally check in allMembers as fallback
-    const allMember = allMembers.find((m) => m._id === task.assignedTo);
-    return allMember ? allMember.name : "Unassigned";
-  };
-
-  // Format status text with capitalized words
-  const formatStatus = (status) => {
-    return status
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  };
-  const recognitionRef = useRef(null);
 
   useEffect(() => {
     const SpeechRecognition =
@@ -403,9 +158,6 @@ const Task = () => {
     recognition.onerror = (event) => {
       console.error("Speech recognition error", event.error);
       setListening(false);
-      if (event.error === "not-allowed") {
-        showPermissionError();
-      }
     };
 
     return () => {
@@ -413,36 +165,112 @@ const Task = () => {
     };
   }, []);
 
-  const showPermissionError = () => {
-    if (window.innerWidth <= 768) {
-      // Mobile devices
-      alert(
-        "Please enable microphone permissions in your browser settings to use voice input."
-      );
-    } else {
-      alert("Please allow microphone access to use voice input.");
+  useEffect(() => {
+    if ("Notification" in window && window.Notification) {
+      window.Notification.requestPermission().then((permission) => {
+        console.log("Notification permission:", permission);
+      });
+    }
+  }, []);
+
+  const handleAddTask = async () => {
+    if (!taskInput.trim() || !assignedTo) {
+      showAppNotification("Please fill all required fields", "error");
+      return;
+    }
+
+    const newDate = new Date().toISOString();
+
+    try {
+      if (editingTaskId !== null) {
+        const res = await axios.put(`${API_BASE}/api/tasks/${editingTaskId}`, {
+          title: taskInput.trim(),
+          assignedTo,
+          status,
+          dueDate: newDate,
+          dueDate1: dueDate1 || newDate,
+        });
+        setTasks((prev) =>
+          prev.map((t) => (t._id === editingTaskId ? res.data : t))
+        );
+        setAnimationMap((prev) => ({
+          ...prev,
+          [editingTaskId]: "animate-update",
+        }));
+        setEditingTaskId(null);
+        showAppNotification("✅ Task updated!", "success");
+      } else {
+        const res = await axios.post(`${API_BASE}/api/tasks`, {
+          title: taskInput.trim(),
+          assignedTo,
+          status,
+          dueDate: newDate,
+          dueDate1: dueDate1 || newDate,
+        });
+        setTasks((prev) => [res.data, ...prev]);
+        setAnimationMap((prev) => ({ ...prev, [res.data._id]: "animate-add" }));
+        showAppNotification("🎉 Task added!", "success");
+      }
+
+      setTaskInput("");
+      setAssignedTo("");
+      setStatus("pending");
+    } catch (err) {
+      showAppNotification("Error saving task", "error");
+      console.error(err);
     }
   };
 
-  const checkMicrophonePermission = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach((track) => track.stop());
-      return true;
-    } catch (err) {
-      return false;
+  const handleDelete = (id) => {
+    if (editingTaskId === id) setEditingTaskId(null);
+
+    setAnimationMap((prev) => ({ ...prev, [id]: "animate-delete" }));
+    setTimeout(async () => {
+      try {
+        await axios.delete(`${API_BASE}/api/tasks/${id}`);
+        setTasks((tasks) => tasks.filter((task) => task._id !== id));
+        setAnimationMap((prev) => {
+          const updated = { ...prev };
+          delete updated[id];
+          return updated;
+        });
+        showAppNotification("🗑️ Task deleted!", "success");
+      } catch (err) {
+        showAppNotification("Failed to delete task", "error");
+        console.error(err);
+      }
+    }, 400);
+  };
+
+  const handleEdit = (id) => setEditingTaskId(id);
+  const handleCancelEdit = () => setEditingTaskId(null);
+
+  const getInternIdByName = (name) => {
+    const intern = teamMembers.find((member) => member.name === name);
+    return intern ? intern._id : "";
+  };
+
+  const getAssignedName = (task) => {
+    if (task.assignedTo && typeof task.assignedTo === "object") {
+      return task.assignedTo.name;
     }
+
+    const teamMember = teamMembers.find((m) => m._id === task.assignedTo);
+    if (teamMember) return teamMember.name;
+
+    const allMember = allMembers.find((m) => m._id === task.assignedTo);
+    return allMember ? allMember.name : "Unassigned";
+  };
+
+  const formatStatus = (status) => {
+    return status
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   };
 
   const handleVoiceInput = async () => {
     if (!recognitionRef.current) return;
-
-    const hasPermission = await checkMicrophonePermission();
-    if (!hasPermission) {
-      showPermissionError();
-      return;
-    }
-
     setListening(true);
     try {
       recognitionRef.current.start();
@@ -451,29 +279,25 @@ const Task = () => {
       setListening(false);
     }
   };
+
   const filteredTasks = tasks.filter((task) => {
-    // Get the assigned ID (handling both object and string cases)
     const taskAssignedTo =
       task.assignedTo === null || task.assignedTo === undefined
         ? undefined
         : typeof task.assignedTo === "object"
         ? task.assignedTo._id
         : task.assignedTo;
-    // Filter by mentor if selected
+
     if (selectedMentor) {
       const teamMemberIds = teamMembers.map((member) => member._id);
-
-      // Check if task is assigned to any team member
       if (!teamMemberIds.includes(taskAssignedTo)) return false;
 
-      // Filter by selected intern if any
       if (selectedIntern) {
         const selectedInternId = getInternIdByName(selectedIntern);
         return taskAssignedTo === selectedInternId;
       }
     }
 
-    // Filter by search term if any
     if (searchTerm) {
       const internName = getAssignedName(task).toLowerCase();
       const taskTitle = (task.title || task.task).toLowerCase();
@@ -493,6 +317,7 @@ const Task = () => {
 
   return (
     <div className="task-container">
+      {/* Notification Setup Button */}
       <div style={{ textAlign: "left", margin: "10px 0" }}>
         {notificationSupported && (
           <button
@@ -526,13 +351,13 @@ const Task = () => {
       </div>
 
       {showNotification && (
-        <AppNotification // Changed from Notification
+        <AppNotification
           message={notificationMessage}
           type={notificationType}
           onClose={() => setShowNotification(false)}
         />
       )}
-      {/* <img src={logo} alt="ResoluteAI" className="logo" /> */}
+
       <h1 className="app-heading">Interns Task Management Application</h1>
 
       <div className="top-header">
@@ -542,10 +367,9 @@ const Task = () => {
         </h2>
       </div>
 
-      {/* Mentor selection */}
+      {/* Mentor Select */}
       <div className="section">
         <div className="filter-section">
-          {/* Mentor selection */}
           <div className="section mentor-select">
             <label htmlFor="mentor-select">Select Mentor:</label>
             <select
@@ -563,6 +387,8 @@ const Task = () => {
           </div>
         </div>
       </div>
+
+      {/* Search */}
       <div className="section search-box">
         <label htmlFor="task-search">Search Tasks:</label>
         <div className="search-container">
@@ -577,9 +403,9 @@ const Task = () => {
         </div>
       </div>
 
-      {/* Show team members & task form if mentor selected */}
       {selectedMentor && (
         <>
+          {/* Team Members */}
           <div className="section">
             <h3>
               <span className="teams">Team Members under Selected Mentor:</span>
@@ -603,86 +429,69 @@ const Task = () => {
             </ul>
           </div>
 
-          {/* Task form */}
-          <div className="section form-section">
+          {/* Task Form */}
+          <div className="section task-form">
+            <h3>{editingTaskId ? "Edit Task" : "Add New Task"}</h3>
+
+            <label htmlFor="task-title">Task Title:</label>
             <input
+              id="task-title"
               type="text"
-              placeholder="Enter Task"
               value={taskInput}
               onChange={(e) => setTaskInput(e.target.value)}
-              style={{ width: "500px" }} // Set any width you want
             />
 
-            <button
-              onClick={startListening}
-              className={`voice-button ${listening ? "listening" : ""}`}
-              disabled={!voiceSupported}
-              title={
-                voiceSupported ? "Use voice input" : "Voice input not supported"
-              }
-              style={{ marginLeft: "-8px" }}
-            >
-              <Mic size={15} />
-              {listening && <span className="pulse-ring"></span>}
-            </button>
-
+            <label htmlFor="intern-select">Assign To:</label>
             <select
+              id="intern-select"
               value={assignedTo}
               onChange={(e) => setAssignedTo(e.target.value)}
-              className="spaced-element"
             >
-              <option value="">Assign to</option>
+              <option value="">-- Select Intern --</option>
               {teamMembers.map((member) => (
                 <option key={member._id} value={member._id}>
                   {member.name}
                 </option>
               ))}
             </select>
+
+            <label htmlFor="due-date">Due Date:</label>
             <input
               type="date"
+              id="due-date"
               value={dueDate1}
               onChange={(e) => setDueDate1(e.target.value)}
-              className="spaced-element"
-              min={new Date().toISOString().split("T")[0]} // Prevent selecting past dates
             />
 
+            <label htmlFor="status">Status:</label>
             <select
+              id="status"
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="spaced-element"
             >
               <option value="pending">Pending</option>
               <option value="in progress">In Progress</option>
               <option value="completed">Completed</option>
             </select>
 
-            {editingTaskId !== null ? (
-              <>
-                <button
-                  onClick={handleAddTask}
-                  disabled={!selectedMentor || !assignedTo}
-                  className="spaced-element"
-                >
-                  Update Task
-                </button>
-                <button onClick={handleCancelEdit} className="spaced-element">
+            <div className="form-actions">
+              <button onClick={handleAddTask}>
+                {editingTaskId ? "Update Task" : "Add Task"}
+              </button>
+              {editingTaskId && (
+                <button onClick={handleCancelEdit} className="cancel-button">
                   Cancel
                 </button>
-              </>
-            ) : (
-              <button
-                onClick={handleAddTask}
-                disabled={!selectedMentor || !assignedTo}
-                className="spaced-element"
-              >
-                Add Task
+              )}
+              <button onClick={handleVoiceInput}>
+                {listening ? "🎙 Listening..." : "🎤 Use Voice"}
               </button>
-            )}
+            </div>
           </div>
         </>
       )}
 
-      {/* Tasks list */}
+      {/* Tasks List */}
       <div className="tasks-section">
         <h3>
           <span className="tasksmore">Tasks List</span>
@@ -716,7 +525,8 @@ const Task = () => {
                   </span>
                 </p>
                 <p>
-                  Assigned Date: {new Date(task.dueDate).toLocaleDateString()}
+                  Assigned Date:{" "}
+                  {new Date(task.dueDate).toLocaleDateString()}
                 </p>
                 <p>
                   Due Date:{" "}
@@ -733,6 +543,8 @@ const Task = () => {
           ))
         )}
       </div>
+
+      {/* Logout */}
       <button
         onClick={() => {
           localStorage.removeItem("isLoggedIn");

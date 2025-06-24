@@ -1,0 +1,52 @@
+.charts-container {
+  padding: 20px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.charts-title {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.dropdown-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* ✅ spacing between label and select */
+  margin: 20px 0;
+}
+
+.dropdown-container label {
+  font-size: 16px;
+}
+
+.dropdown-container select {
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.charts-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.chart-box {
+  flex: 1 1 220px;
+  /* max-width: 240px; */
+  min-width: 220px;
+  height: 300px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 16px 12px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

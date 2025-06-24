@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import "./UpdatePassword.css";
+import "./styles/UpdatePassword.css";
 
 const UpdatePassword = () => {
   const [user, setUser] = useState(null);
@@ -12,7 +12,7 @@ const UpdatePassword = () => {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
    const API_BASE = process.env.REACT_APP_API_BASE_URL;
-  const API_URL = "http://localhost:5000";
+  // const API_URL = "http://localhost:5000";
 
   useEffect(() => {
     const fetchUser = async () => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import "./AttendancePage.css";
-import "./adduser.css";
+import "./styles/AttendancePage.css";
+import "./styles/adduser.css";
 
 const AttendancePage = () => {
   const [members, setMembers] = useState([]);
@@ -25,7 +25,9 @@ const AttendancePage = () => {
   // Format current date in India
   const today = new Date().toLocaleDateString("en-CA");
   const API_BASE = process.env.REACT_APP_API_BASE_URL;
-  const API_URL = "http://localhost:5000";
+  // const API_URL = "http://localhost:5000";
+
+  
 
   const handleAddUser = async (e) => {
     e.preventDefault();
@@ -95,46 +97,64 @@ const AttendancePage = () => {
 
   // Fetch attendance when selectedDate or members change
   useEffect(() => {
-    if (selectedDate && members.length > 0) {
-      fetchAllAttendance(selectedDate);
-    }
-  }, [selectedDate, members]);
+  const today = new Date();
+  const day = today.getDay(); // Sunday = 0, Saturday = 6
 
-  const fetchAllAttendance = async (selectedDate) => {
-    setIsLoading(true);
-    setMessage('');
-    try {
-      const parsedDate = new Date(selectedDate).toLocaleDateString();
-      const attendanceRecords = {};
+  // Check if it's weekend
+  if (day === 0 || day === 6) {
+    setMessage("📅 Today is a weekend (Saturday or Sunday). No attendance required.");
+    setFetchedAttendance({});
+    return; // Do not fetch attendance
+  }
 
-      for (const member of members) {
-        const res = await fetch(
-          `${API_BASE}/api/members/members/${member._id}/attendance`
-        );
+  if (selectedDate && members.length > 0) {
+    fetchAllAttendance(selectedDate);
+  }
+}, [selectedDate, members]);
 
+
+ const fetchAllAttendance = async (selectedDate) => {
+  setIsLoading(true);
+  setMessage('');
+  try {
+    const parsedDate = new Date(selectedDate).toLocaleDateString();
+
+    const attendanceResults = await Promise.all(
+      members.map(async (member) => {
+        const res = await fetch(`${API_BASE}/api/members/members/${member._id}/attendance`);
         if (res.ok) {
           const data = await res.json();
           const matching = data.attendance.find(
             (item) => new Date(item.date).toLocaleDateString() === parsedDate
           );
-
-          attendanceRecords[member._id] = matching
-            ? matching
-            : { present: false, leaveReason: '' };
+          return {
+            memberId: member._id,
+            attendance: matching ? matching : { present: false, leaveReason: '' }
+          };
         } else {
-          attendanceRecords[member._id] = { present: false, leaveReason: '' };
+          return {
+            memberId: member._id,
+            attendance: { present: false, leaveReason: '' }
+          };
         }
-      }
+      })
+    );
 
-      setFetchedAttendance(attendanceRecords);
-      setMessage("Attendance data fetched successfully.");
-    } catch (err) {
-      console.error(err);
-      setMessage(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const attendanceRecords = {};
+    attendanceResults.forEach(({ memberId, attendance }) => {
+      attendanceRecords[memberId] = attendance;
+    });
+
+    setFetchedAttendance(attendanceRecords);
+    setMessage("Attendance data fetched successfully.");
+  } catch (err) {
+    console.error(err);
+    setMessage(err.message);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
   
   // Handle delete functionality
   const handleConfirmDelete = async (e) => {
@@ -163,6 +183,7 @@ const AttendancePage = () => {
         setDeleteUserMessage("Member deleted successfully.");
         setSelectedMemberId('');
         setSearchTermToDelete('');
+        setShowDeleteUserForm(false)
       } else {
         const data = await res.json();
         setDeleteUserMessage(`Error: ${data.error}`);
@@ -369,7 +390,7 @@ const AttendancePage = () => {
                   <td>{new Date(selectedDate).toLocaleDateString()}</td>
                   <td style={{ 
                     backgroundColor: attendance?.leaveReason ? "rgb(215 200 88)" : 
-                    attendance?.present ? "#d0f0c0" : "rgb(196 136 132)" 
+                    attendance?.present ? "#d0f0c0" : "rgb(197 168 166)" 
                   }}>
                     {attendance?.present ? "Yes" : "No"}
                   </td>
@@ -419,7 +440,7 @@ const AttendancePage = () => {
     <li style={{ marginBottom: "10px" }}>
       <span
         style={{ 
-          backgroundColor: "rgb(196 136 132)", 
+          backgroundColor: "rgb(197 168 166)", 
           color: "black", 
           padding: "5px 10px", 
           borderRadius: "5px",
