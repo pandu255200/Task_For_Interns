@@ -99,12 +99,10 @@
   }
 }
 
-<<<<<<< HEAD:src/components/reports.css
-=======
 
 
 
->>>>>>> 242675a (updating the codes and adding the new components and styles and updating app.js also):src/components/styles/reports.css
+
 /* Mobile styles (max-width: 600px) */
 @media (max-width: 600px) {
   .reports-container {
@@ -127,11 +125,11 @@
     flex-direction: column;
   }
 
-<<<<<<< HEAD:src/components/reports.css
-  .team-report,
-=======
+
+ 
+
   .team-report, 
->>>>>>> 242675a (updating the codes and adding the new components and styles and updating app.js also):src/components/styles/reports.css
+
   .individual-report {
     width: 100%;
     min-width: unset;
@@ -148,11 +146,10 @@
     flex-direction: column;
   }
 
-<<<<<<< HEAD:src/components/reports.css
-  .charts,
-=======
+
+
   .charts, 
->>>>>>> 242675a (updating the codes and adding the new components and styles and updating app.js also):src/components/styles/reports.css
+
   .charts1 {
     min-width: 100%;
     max-width: 100%;
@@ -179,25 +176,18 @@
     font-size: 1rem;
   }
 
-<<<<<<< HEAD:src/components/reports.css
-  .team-report,
-=======
+
   .team-report, 
->>>>>>> 242675a (updating the codes and adding the new components and styles and updating app.js also):src/components/styles/reports.css
+
   .individual-report {
     padding: 12px 10px;
   }
 
-<<<<<<< HEAD:src/components/reports.css
-  .charts,
-  .charts1 {
-    padding: 10px;
-  }
-}
-=======
+
+  
   .charts, 
   .charts1 {
     padding: 10px;
   }
 }
->>>>>>> 242675a (updating the codes and adding the new components and styles and updating app.js also):src/components/styles/reports.css
+
